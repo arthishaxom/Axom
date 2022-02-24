@@ -84,11 +84,9 @@ class misc(commands.Cog):
 
         total_servers = len(serverlist)
         serverlist = [serverlist[i:i+10] for i in range(0,total_servers,10)]
-        await ctx.send(serverlist)
 
         serverlist_strings = []
         for i in range(len(serverlist)):
-            await ctx.send(serverlist[i])
             server_strings = "\n".join(serverlist[i])
             serverlist_strings.append(server_strings)
 
