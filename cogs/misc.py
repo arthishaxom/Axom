@@ -6,16 +6,7 @@ import psutil
 
 class MySource(menus.ListPageSource):
     async def format_page(self, menu, entries):
-        serverlist = []
-        i = 0
-        for guild in self.client.guilds:
-            i+=1
-            e = f"` {str(i)} ` - {guild.name} : `{guild.id}`"
-            serverlist.append(e)
-
-        total_servers = len(serverlist)
         embed = discord.Embed(
-            title = f"{total_servers}",
             description=f"{entries}", 
             color=discord.Colour.gold())
         embed.set_footer(text=f"Requested by {menu.ctx.author}")
