@@ -24,6 +24,7 @@ async def create_pool():
     client.db = await asyncpg.connect(host='bunbhl3ahvcmset3bk2e-postgresql.services.clever-cloud.com', port=5432,user='uooqkec81x9lbjrz6noi', password='dMlCwvxEyVASRyAsRFuB', database='bunbhl3ahvcmset3bk2e')
     print("connected to db")
 
+
 client.loop.run_until_complete(create_pool())
 
 
