@@ -10,7 +10,7 @@ with open("config.json",'r') as configjsonFile:
 
 times_used = 0
 activity = discord.Activity(type = discord.ActivityType.watching, name="Leaderboards & Points")
-client = commands.Bot(command_prefix='#',activity=activity,strip_after_prefix = True,owner_id = 315342835283001344)
+client = commands.Bot(command_prefix='&',activity=activity,strip_after_prefix = True,owner_id = 315342835283001344)
 client.remove_command("help")
 
 
