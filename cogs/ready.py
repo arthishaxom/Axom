@@ -30,9 +30,8 @@ class Ready(commands.Cog):
     async def db_check(self):
         channel = self.client.get_channel(918849166371868712)
         await channel.send("Test Successful!")
-        async with self.client.db.cursor() as cur:
-            await cur.execute("CREATE TABLE IF NOT EXISTS test1(team1 VARCHAR(255))")
-            await cur.execute("DROP TABLE IF EXISTS test1")
+        await self.client.db.execute("CREATE TABLE IF NOT EXISTS test1(team1 VARCHAR(255))")
+        await self.client.db.execute("DROP TABLE IF EXISTS test1")
 
     @commands.Cog.listener()
     async def on_message(self,message: discord.Message) -> None:

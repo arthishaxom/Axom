@@ -136,9 +136,8 @@ __Example__ :
                 if i.isalnum():
                     server_name += i
 
-            async with self.client.db.cursor() as cur:
-                for i in range(nmatches):
-                    await cur.execute(f"CREATE TABLE IF NOT EXISTS {server_name}match{i+1}({server_name}team{i+1} VARCHAR(255),{server_name}pos{i+1} BIGINT, {server_name}kill{i+1} BIGINT, {server_name}cd{i+1} BIGINT, {server_name}slot{i+1} VARCHAR(255))")
+            for i in range(nmatches):
+                await self.client.db.execute(f"CREATE TABLE IF NOT EXISTS {server_name}match{i+1}({server_name}team{i+1} VARCHAR(255),{server_name}pos{i+1} BIGINT, {server_name}kill{i+1} BIGINT, {server_name}cd{i+1} BIGINT, {server_name}slot{i+1} VARCHAR(255))")
 
             await nmatches_raw.delete()
             for i in range(nmatches):
@@ -178,8 +177,7 @@ __Example__ :
                         dta2 = dtal.split(",")
                         macd = {1:1,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0,21:0,22:0,23:0,24:0,25:0}
                         mapos = {1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0,21:0,22:0,23:0,24:0,25:0}
-                        async with self.client.db.cursor() as cur:
-                            await cur.execute(f"INSERT INTO {server_name}match{i+1}({server_name}slot{i+1},{server_name}team{i+1},{server_name}pos{i+1},{server_name}kill{i+1},{server_name}cd{i+1}) VALUES(%s,%s,%s,%s,%s)",(dta2[1],preteam[str(dta2[1]).lower()],mapos[int(dta2[0])],int(dta2[2]),macd[int(dta2[0])]))
+                        await self.client.db.execute(f"INSERT INTO {server_name}match{i+1}({server_name}slot{i+1},{server_name}team{i+1},{server_name}pos{i+1},{server_name}kill{i+1},{server_name}cd{i+1}) VALUES($1,$2,$3,$4,$5)",dta2[1],preteam[str(dta2[1]).lower()],mapos[int(dta2[0])],int(dta2[2]),macd[int(dta2[0])])
                     await msg.add_reaction("✅")
                     await asyncio.sleep(1)
                     await msg.delete()
@@ -187,9 +185,8 @@ __Example__ :
                     await msg.add_reaction("❌")
                     embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
                     await ctx.send(embed = embed)
-                    async with self.client.db.cursor() as cur:
-                        for i in range(nmatches):
-                            await cur.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+                    for i in range(nmatches):
+                        await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
                     return
             
 
@@ -208,9 +205,8 @@ __Example__ :
                 await msg.add_reaction("❌")
                 embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
                 await ctx.send(embed = embed)
-                async with self.client.db.cursor() as cur:
-                    for i in range(nmatches):
-                        await cur.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+                for i in range(nmatches):
+                    await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
                 return
             await wait_msg.delete()
             result_format = {1:" LIMIT 25",2:" LIMIT 20",3:""}
@@ -225,13 +221,12 @@ __Example__ :
                 poss += f' + {server_name}pos{i+1}'
                 joint += f' INNER JOIN {server_name}match{i+1} ON {server_name}slot1 = {server_name}slot{i+1}'
 
-            async with self.client.db.cursor() as cur:
-                if nmatches == 1:
-                    await cur.execute(f"SELECT {server_name}team1,{server_name}cd1,{server_name}pos1,{server_name}kill1,({server_name}pos1 + {server_name}kill1) AS {server_name}total FROM {server_name}match1 ORDER BY {server_name}total DESC,{server_name}cd1 DESC,{server_name}pos1 DESC, {server_name}kill1 DESC LIMIT {result_format[msg]}")
-                    teamis = await cur.fetchall()
-                else:
-                    await cur.execute(f"SELECT {server_name}team1,({cd}) AS {server_name}cdt,({poss}) AS {server_name}post,({kills}) AS {server_name}killt,({poss} + {kills}) AS {server_name}total FROM {joint} ORDER BY {server_name}total DESC,{server_name}cdt DESC,{server_name}post DESC,{server_name}killt DESC{result_format[msg]}")
-                    teamis = await cur.fetchall()
+            if nmatches == 1:
+                teamis = await self.client.db.fetch(f"SELECT {server_name}team1,{server_name}cd1,{server_name}pos1,{server_name}kill1,({server_name}pos1 + {server_name}kill1) AS {server_name}total FROM {server_name}match1 ORDER BY {server_name}total DESC,{server_name}cd1 DESC,{server_name}pos1 DESC, {server_name}kill1 DESC{result_format[msg]}")
+                # teamis = await self.client.db.fetchall()
+            else:
+                teamis = await self.client.db.fetch(f"SELECT {server_name}team1,({cd}) AS {server_name}cdt,({poss}) AS {server_name}post,({kills}) AS {server_name}killt,({poss} + {kills}) AS {server_name}total FROM {joint} ORDER BY {server_name}total DESC,{server_name}cdt DESC,{server_name}post DESC,{server_name}killt DESC{result_format[msg]}")
+                # teamis = await self.client.db.fetchall()
 
             valteams = [record[0] for record in teamis]
             valteamsl = ",".join(valteams)
@@ -250,9 +245,8 @@ __Example__ :
             embed6 = discord.Embed(description = f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}',color = discord.Colour.gold())
             embed6.set_footer(text = "HOLD TO COPY | USE &lb TO LEADERBOARD")
             await embed_msg.edit(embed = embed6)
-            async with self.client.db.cursor() as cur:
-                for i in range(nmatches):
-                    await cur.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+            for i in range(nmatches):
+                await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
     
     @commands.command(name = 'nametable',aliases=['nt'])
     @commands.is_owner()
@@ -270,9 +264,10 @@ __Example__ :
                 server_name += i
 
         table_nums = 0
-        async with self.client.db.cursor() as cur:
-            await cur.execute(f"SHOW TABLES")
-            tables = await cur.fetchall()
+        tables = await self.client.db.fetch('''
+        SELECT table_name FROM information_schema.tables
+        WHERE table_schema = 'public'
+        ''')
         table_names = []
         for i in tables:
             table_names.append(i)
@@ -289,10 +284,9 @@ This Much Only**
             response = await self.client.wait_for("message", timeout=120, check=check)
             response = response.content
             if response.lower() in ['yes','y']:
-                async with self.client.db.cursor() as cur:
-                    for i in range(table_nums):
-                        await cur.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
-                        await cur.execute(f"DROP TABLE IF EXISTS match{i+1}")
+                for i in range(table_nums):
+                    await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+                    await self.client.db.execute(f"DROP TABLE IF EXISTS match{i+1}")
                 await ctx.send("DONE")
             else:
                 await ctx.send("OK")
