@@ -26,7 +26,7 @@ class Ready(commands.Cog):
         except:
             return
 
-    @tasks.loop(hours = 7)
+    @tasks.loop(hours = 2)
     async def db_check(self):
         channel = self.client.get_channel(918849166371868712)
         await channel.send("Test Successful!")

@@ -21,7 +21,7 @@ intents.members = True
 
 async def create_pool():
     # client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', db='railway')
-    client.db = await asyncpg.connect(host='bunbhl3ahvcmset3bk2e-postgresql.services.clever-cloud.com', port=5432,user='uooqkec81x9lbjrz6noi', password='dMlCwvxEyVASRyAsRFuB', database='bunbhl3ahvcmset3bk2e')
+    client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', database='railway')
     print("connected to db")
 
 
