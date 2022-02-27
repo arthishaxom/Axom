@@ -12,7 +12,8 @@ class Ready(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         try:
-            self.db_check.start()
+            channel = self.client.get_channel(918849166371868712)
+            await channel.send("I Am Here So What The Fear")
         except:
             pass
         print("SAB SAHI HAI BIDU")
@@ -26,12 +27,12 @@ class Ready(commands.Cog):
         except:
             return
 
-    @tasks.loop(hours = 2)
-    async def db_check(self):
-        channel = self.client.get_channel(918849166371868712)
-        await channel.send("Test Successful!")
-        await self.client.db.execute("CREATE TABLE IF NOT EXISTS test1(team1 VARCHAR(255))")
-        await self.client.db.execute("DROP TABLE IF EXISTS test1")
+    # @tasks.loop(hours = 2)
+    # async def db_check(self):
+    #     channel = self.client.get_channel(918849166371868712)
+    #     await channel.send("Test Successful!")
+    #     await self.client.db.execute("CREATE TABLE IF NOT EXISTS test1(team1 VARCHAR(255))")
+    #     await self.client.db.execute("DROP TABLE IF EXISTS test1")
 
     @commands.Cog.listener()
     async def on_message(self,message: discord.Message) -> None:

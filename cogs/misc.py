@@ -111,6 +111,9 @@ Total Users : {member_count}
         embed.add_field(name="**__System Stats__**",value = f'''
 CPU : {cpu_usage}% Used
 RAM : {memory_usage}/{memory_total} Used
+
+
+Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)
 ''')
         embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
 

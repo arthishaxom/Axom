@@ -11,25 +11,25 @@ class help(commands.Cog):
 	@commands.group(name="help",pass_context = True,invoke_without_command = True,case_insensitive = True,aliases = ['h','Help','HELP'])
 	async def help(self, ctx):
 			
-			embed = discord.Embed(title = "Axom | Command List",description = "<a:excla_blue:939127974878380042> | My Prefix Is `&`\n<a:excla_blue:939127974878380042> | I Am A Bot For Calculating Games Points & Making Leaderboards.",color = discord.Colour.gold())
+			embed = discord.Embed(title = "Axom | Command List",description = "<:line_top:947143646334042122> My Prefix Is `&`\n<:line_bottom:947143905810473050> I Am A Bot For Calculating Games Points & Making Leaderboards.",color = discord.Colour.gold())
 			embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 			embed.set_thumbnail(url=self.client.user.display_avatar.url)
 			embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-			embed.add_field(name="Leaderboard Commands",value = '''
+			embed.add_field(name="<:leaderb:947178467156430868> Leaderboard Commands",value = '''
 **```
 leaderboard,newcalculate,
 ptsetup,slotlist
 ```**
 ''')
-			embed.add_field(name='Misc Commands',value = '''
+			embed.add_field(name='<:box:947178898553204736> Misc Commands',value = '''
 **```
 ping,preview   
 ```**
 ''')
-			embed.add_field(name='Useful Links',value = '''
-**<:icon_guild:938971078737412246> | [Support Server](https://discord.gg/uW7WXxBtBW)
-<:icon_invite:939384170101211196> | [Invite The Bot](https://discord.com/oauth2/authorize?client_id=880314360017338380&permissions=268561601&scope=bot)
-<:upvote:941916901615996998> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
+			embed.add_field(name='<:icon_link:947337569299996712> Useful Links',value = '''
+**<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
+<:bot:947181167990423562> | [Invite The Bot](https://discord.com/oauth2/authorize?client_id=880314360017338380&permissions=268561601&scope=bot)
+<:bot:947181167990423562> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
 **
 ''')
 			await ctx.send(embed=embed)

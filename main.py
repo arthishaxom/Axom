@@ -19,13 +19,13 @@ client.remove_command("help")
 intents = discord.Intents.default()
 intents.members = True
 
-async def create_pool():
-    # client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', db='railway')
-    client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', database='railway')
-    print("connected to db")
+# async def create_pool():
+#     # client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', db='railway')
+#     client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', database='railway')
+#     print("connected to db")
 
 
-client.loop.run_until_complete(create_pool())
+# client.loop.run_until_complete(create_pool())
 
 
 @client.command()

@@ -2,6 +2,9 @@ import discord
 from discord.ui import Button,View
 from discord.ext import commands
 import asyncio
+import os
+import pandas as pd
+import csv
 
 class MyView(View):
     def __init__(self,ctx):
@@ -29,10 +32,10 @@ class newcalc(commands.Cog):
         self.client = client
 
 
-    @commands.command(name='newcalculate', aliases=['ncalc'],case_insensitive = True)
+    @commands.command(name='ncalculate', aliases=['ncalc'],case_insensitive = True)
     @commands.bot_has_permissions(manage_messages = True,embed_links = True)
     @commands.check_any(commands.has_permissions(manage_messages=True),commands.has_role('PT-Mod'),commands.is_owner())
-    async def newcalculate(self,ctx):
+    async def ncalculate(self,ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
 
@@ -136,9 +139,6 @@ __Example__ :
                 if i.isalnum():
                     server_name += i
 
-            for i in range(nmatches):
-                await self.client.db.execute(f"CREATE TABLE IF NOT EXISTS {server_name}match{i+1}({server_name}team{i+1} VARCHAR(255),{server_name}pos{i+1} BIGINT, {server_name}kill{i+1} BIGINT, {server_name}cd{i+1} BIGINT, {server_name}slot{i+1} VARCHAR(255))")
-
             await nmatches_raw.delete()
             for i in range(nmatches):
                 embed4 = discord.Embed(title = "ENTER MATCH POINTS",description = f"Send The Points Of The Match {i+1} As Per Format.",color = discord.Colour.gold())
@@ -153,6 +153,13 @@ __Example__ :
                 datas=msg.content
         
                 try:
+                    column_names = ['teamprefix',f'teamname',f'position{i+1}',f'kills{i+1}',f"cd{i+1}"]
+                    with open(f"{server_name}match{i+1}.csv","w+") as csvf:
+                        csvw = csv.writer(csvf)
+                        csvw.writerow(column_names)
+                    df = pd.read_csv(f"{server_name}match{i+1}.csv")
+
+
                     dta1=datas.splitlines()
                     dta1join = ",".join(dta1)
                     dta1list = dta1join.split(",")
@@ -177,7 +184,9 @@ __Example__ :
                         dta2 = dtal.split(",")
                         macd = {1:1,2:0,3:0,4:0,5:0,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0,21:0,22:0,23:0,24:0,25:0}
                         mapos = {1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1,13:0,14:0,15:0,16:0,17:0,18:0,19:0,20:0,21:0,22:0,23:0,24:0,25:0}
-                        await self.client.db.execute(f"INSERT INTO {server_name}match{i+1}({server_name}slot{i+1},{server_name}team{i+1},{server_name}pos{i+1},{server_name}kill{i+1},{server_name}cd{i+1}) VALUES($1,$2,$3,$4,$5)",dta2[1],preteam[str(dta2[1]).lower()],mapos[int(dta2[0])],int(dta2[2]),macd[int(dta2[0])])
+                        df.loc[x]=[dta2[1],preteam[str(dta2[1]).lower()],mapos[int(dta2[0])],int(dta2[2]),macd[int(dta2[0])]]
+
+                    df.to_csv(f"{server_name}match{i+1}.csv",index=False)
                     await msg.add_reaction("✅")
                     await asyncio.sleep(1)
                     await msg.delete()
@@ -186,7 +195,7 @@ __Example__ :
                     embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
                     await ctx.send(embed = embed)
                     for i in range(nmatches):
-                        await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+                        os.remove(f"{server_name}match{i+1}.csv")
                     return
             
 
@@ -206,93 +215,132 @@ __Example__ :
                 embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
                 await ctx.send(embed = embed)
                 for i in range(nmatches):
-                    await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+                    os.remove(f"{server_name}match{i+1}.csv")
                 return
             await wait_msg.delete()
-            result_format = {1:" LIMIT 25",2:" LIMIT 20",3:""}
+            result_format = {1:25,2:20}
 
-            cd = f'{server_name}cd1'
-            kills = f'{server_name}kill1'
-            poss = f'{server_name}pos1'
-            joint = f'{server_name}match1'
-            for i in range(1,nmatches):
-                cd += f' + {server_name}cd{i+1}'
-                kills += f' + {server_name}kill{i+1}'
-                poss += f' + {server_name}pos{i+1}'
-                joint += f' INNER JOIN {server_name}match{i+1} ON {server_name}slot1 = {server_name}slot{i+1}'
+            col_total = []
+            col_position = []
+            col_kills = []
+            col_wwcd = []
+            try:
+                if nmatches == 1:
+                    df1 = pd.read_csv(f"{server_name}match1.csv")
+                    col_to_sum = ['position1','kills1']
+                    df1["total1"] = df1[col_to_sum].sum(axis=1)
+                    df1.sort_values(by=["total1","cd1","position1","kills1"],ascending=False,inplace=True)
+                    
+                if nmatches == 2:
+                    df1 = pd.read_csv(f"{server_name}match1.csv")
+                    df2 = pd.read_csv(f"{server_name}match2.csv")
+                    df_total = pd.merge(df1,df2,on=["teamprefix","teamname"],how="inner")
+                    for i in range(nmatches):
+                        col_total.append(f"position{i+1}")
+                        col_total.append(f"kills{i+1}")
 
-            if nmatches == 1:
-                teamis = await self.client.db.fetch(f"SELECT {server_name}team1,{server_name}cd1,{server_name}pos1,{server_name}kill1,({server_name}pos1 + {server_name}kill1) AS {server_name}total FROM {server_name}match1 ORDER BY {server_name}total DESC,{server_name}cd1 DESC,{server_name}pos1 DESC, {server_name}kill1 DESC{result_format[msg]}")
-                # teamis = await self.client.db.fetchall()
-            else:
-                teamis = await self.client.db.fetch(f"SELECT {server_name}team1,({cd}) AS {server_name}cdt,({poss}) AS {server_name}post,({kills}) AS {server_name}killt,({poss} + {kills}) AS {server_name}total FROM {joint} ORDER BY {server_name}total DESC,{server_name}cdt DESC,{server_name}post DESC,{server_name}killt DESC{result_format[msg]}")
-                # teamis = await self.client.db.fetchall()
+                        col_position.append(f"position{i+1}")
+                        col_kills.append(f"kills{i+1}")
+                        col_wwcd.append(f"cd{i+1}")
 
-            valteams = [record[0] for record in teamis]
-            valteamsl = ",".join(valteams)
-            valcds = [record[1] for record in teamis]
-            valcdc = [str(ele) for ele in valcds]
-            valcdsl = ",".join(valcdc)
-            valposs = [record[2] for record in teamis]
-            valpossc = [str(ele) for ele in valposs]
-            valpossl = ",".join(valpossc)
-            valkillrs = [record[3] for record in teamis]
-            valkillrsc = [str(ele) for ele in valkillrs]
-            valkillrsl = ",".join(valkillrsc)
-            valtotals = [record[4] for record in teamis]
-            valtotalsc = [str(ele) for ele in valtotals]
-            valtotalsl = ",".join(valtotalsc)
+                    df_total["total_pts"] = df_total[col_total].sum(axis=1)
+                    df_total["total_position"] = df_total[col_position].sum(axis=1)
+                    df_total["total_kills"] = df_total[col_kills].sum(axis=1)
+                    df_total["total_wwcd"] = df_total[col_wwcd].sum(axis=1)
+
+                    df_total.sort_values(by=["total_pts","total_position","total_wwcd","total_kills"],ascending=False,inplace=True)
+                
+                if nmatches > 2:
+                    df1 = pd.read_csv(f"{server_name}match1.csv")
+                    df2 = pd.read_csv(f"{server_name}match2.csv")
+                    df_total = pd.merge(df1,df2,on=["teamprefix","teamname"],how="inner")
+                    for i in range(nmatches-2):
+                        df1 = pd.read_csv(f"{server_name}match{i+3}.csv")
+                        df_total=pd.merge(df_total,df1,on=["teamprefix","teamname"],how="inner")
+                    for i in range(nmatches):
+                        col_total.append(f"position{i+1}")
+                        col_total.append(f"kills{i+1}")
+
+                        col_position.append(f"position{i+1}")
+                        col_kills.append(f"kills{i+1}")
+                        col_wwcd.append(f"cd{i+1}")
+
+                    df_total["total_pts"] = df_total[col_total].sum(axis=1)
+                    df_total["total_position"] = df_total[col_position].sum(axis=1)
+                    df_total["total_kills"] = df_total[col_kills].sum(axis=1)
+                    df_total["total_wwcd"] = df_total[col_wwcd].sum(axis=1)
+
+                    df_total.sort_values(by=["total_pts","total_position","total_wwcd","total_kills"],ascending=False,inplace=True)
+            except Exception as e:
+                embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
+                await ctx.send(embed = embed)
+                for i in range(nmatches):
+                    os.remove(f"{server_name}match{i+1}.csv")
+                return
+
+
+
+            try:
+                if nmatches == 1:
+                    valteams = df1["teamname"].to_list()
+                    valcds = df1["cd1"].to_list()
+                    valposs = df1["position1"].to_list()
+                    valkillrs = df1["kills1"].to_list()
+                    valtotals = df1["total1"].to_list()
+
+                    if msg in [1,2]:
+                        valteams = valteams[:result_format[msg]]
+                        valcds = valcds[:result_format[msg]]
+                        valposs = valposs[:result_format[msg]]
+                        valkillrs = valkillrs[:result_format[msg]]
+                        valtotals = valtotals[:result_format[msg]]
+
+
+                    valteamsl = ",".join(valteams)
+                    valcdc = [str(ele) for ele in valcds]
+                    valcdsl = ",".join(valcdc)
+                    valpossc = [str(ele) for ele in valposs]
+                    valpossl = ",".join(valpossc)
+                    valkillrsc = [str(ele) for ele in valkillrs]
+                    valkillrsl = ",".join(valkillrsc)
+                    valtotalsc = [str(ele) for ele in valtotals]
+                    valtotalsl = ",".join(valtotalsc)
+                else:
+                    valteams = df_total["teamname"].to_list()
+                    valcds = df_total["total_wwcd"].to_list()
+                    valposs = df_total["total_position"].to_list()
+                    valkillrs = df_total["total_kills"].to_list()
+                    valtotals = df_total["total_pts"].to_list()
+
+                    if msg in [1,2]:
+                        valteams = valteams[:result_format[msg]]
+                        valcds = valcds[:result_format[msg]]
+                        valposs = valposs[:result_format[msg]]
+                        valkillrs = valkillrs[:result_format[msg]]
+                        valtotals = valtotals[:result_format[msg]]
+
+                    valteamsl = ",".join(valteams)
+                    valcdc = [str(ele) for ele in valcds]
+                    valcdsl = ",".join(valcdc)
+                    valpossc = [str(ele) for ele in valposs]
+                    valpossl = ",".join(valpossc)
+                    valkillrsc = [str(ele) for ele in valkillrs]
+                    valkillrsl = ",".join(valkillrsc)
+                    valtotalsc = [str(ele) for ele in valtotals]
+                    valtotalsl = ",".join(valtotalsc)
+            except Exception as e:
+                embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
+                await ctx.send(embed = embed)
+                for i in range(nmatches):
+                    os.remove(f"{server_name}match{i+1}.csv")
+                return
             embed6 = discord.Embed(description = f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}',color = discord.Colour.gold())
             embed6.set_footer(text = "HOLD TO COPY | USE &lb TO LEADERBOARD")
             await embed_msg.edit(embed = embed6)
             for i in range(nmatches):
-                await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
+                os.remove(f"{server_name}match{i+1}.csv")
     
-    @commands.command(name = 'nametable',aliases=['nt'])
-    @commands.is_owner()
-    async def nametable(self, ctx,*,serverid = 856152785880088587):
 
-        def check(msg):
-            return msg.author == ctx.author and msg.channel == ctx.channel
-        
-        server = self.client.get_guild(int(serverid))
-
-        server_nname = server.name
-        server_name = ''
-        for i in server_nname:
-            if i.isalnum():
-                server_name += i
-
-        table_nums = 0
-        tables = await self.client.db.fetch('''
-        SELECT table_name FROM information_schema.tables
-        WHERE table_schema = 'public'
-        ''')
-        table_names = []
-        for i in tables:
-            table_names.append(i)
-            table_nums+=1
-        table_names = "\n".join([str(i) for i in table_names])
-        embed = discord.Embed(title = f'{server_nname}',description=f'''
->>> **Server Name : {server_nname}
-{table_names}
-This Much Only**
-''')
-        await ctx.send(embed=embed)
-        if len(table_names) >= 1:
-            await ctx.send("`Wanna Delete These?`")
-            response = await self.client.wait_for("message", timeout=120, check=check)
-            response = response.content
-            if response.lower() in ['yes','y']:
-                for i in range(table_nums):
-                    await self.client.db.execute(f"DROP TABLE IF EXISTS {server_name}match{i+1}")
-                    await self.client.db.execute(f"DROP TABLE IF EXISTS match{i+1}")
-                await ctx.send("DONE")
-            else:
-                await ctx.send("OK")
-        else:
-            return
-    
 
 
         
