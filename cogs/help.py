@@ -23,7 +23,7 @@ ptsetup,slotlist
 ''')
 			embed.add_field(name='<:box:947178898553204736> Misc Commands',value = '''
 **```
-ping,preview   
+ping,preview,botinfo  
 ```**
 ''')
 			embed.add_field(name='<:icon_link:947337569299996712> Useful Links',value = '''
