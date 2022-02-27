@@ -3,6 +3,7 @@ import discord
 from discord import channel
 from discord.ext import commands, tasks
 import re
+import datetime,time
 
 class Ready(commands.Cog):
 
@@ -39,10 +40,6 @@ class Ready(commands.Cog):
         if re.fullmatch(rf"<@!?{self.client.user.id}>",message.content):
             await message.channel.send(f"My prefix is `&`")
             return
-
-
-        
-
 
 def setup(client):
     client.add_cog(Ready(client))

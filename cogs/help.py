@@ -29,7 +29,7 @@ ping,preview
 			embed.add_field(name='<:icon_link:947337569299996712> Useful Links',value = '''
 **<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
 <:bot:947181167990423562> | [Invite The Bot](https://discord.com/oauth2/authorize?client_id=880314360017338380&permissions=268561601&scope=bot)
-<:bot:947181167990423562> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
+<:like:947180731656994866> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
 **
 ''')
 			await ctx.send(embed=embed)
@@ -40,12 +40,12 @@ ping,preview
 			embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 			embed.set_thumbnail(url=self.client.user.display_avatar.url)
 			embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-			embed.add_field(name="<:icon_supp:938970921702678548> Usage",value = '''
+			embed.add_field(name="<:icon_usage:947347839518920714> Usage",value = '''
 **```
 &leaderboard
 ```**
 ''')
-			embed.add_field(name="<:icon_supp:938970921702678548> Aliases",value = '''
+			embed.add_field(name="<:icon_alias:947347903511404555> Aliases",value = '''
 **```
 leaderb,lb
 ```**
@@ -58,12 +58,12 @@ leaderb,lb
 			embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 			embed.set_thumbnail(url=self.client.user.display_avatar.url)
 			embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-			embed.add_field(name="<:icon_supp:938970921702678548> Usage",value = '''
+			embed.add_field(name="<:icon_usage:947347839518920714> Usage",value = '''
 **```
 &preview
 ```**
 ''')
-			embed.add_field(name="<:icon_supp:938970921702678548> Aliases",value = '''
+			embed.add_field(name="<:icon_alias:947347903511404555> Aliases",value = '''
 **```
 prev,pv
 ```**
@@ -76,12 +76,12 @@ prev,pv
 			embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 			embed.set_thumbnail(url=self.client.user.display_avatar.url)
 			embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-			embed.add_field(name="<:icon_supp:938970921702678548> Usage",value = '''
+			embed.add_field(name="<:icon_usage:947347839518920714> Usage",value = '''
 **```
 &newcalculate
 ```**
 ''')
-			embed.add_field(name="<:icon_supp:938970921702678548> Aliases",value = '''
+			embed.add_field(name="<:icon_alias:947347903511404555> Aliases",value = '''
 **```
 ncalc
 ```**
@@ -94,12 +94,12 @@ ncalc
 			embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 			embed.set_thumbnail(url=self.client.user.display_avatar.url)
 			embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-			embed.add_field(name="<:icon_supp:938970921702678548> Usage",value = '''
+			embed.add_field(name="<:icon_usage:947347839518920714> Usage",value = '''
 **```
 &ptsetup
 ```**
 ''')
-			embed.add_field(name="<:icon_supp:938970921702678548> Aliases",value = '''
+			embed.add_field(name="<:icon_alias:947347903511404555> Aliases",value = '''
 **```
 pts
 ```**
@@ -112,12 +112,12 @@ pts
 			embed.set_author(name=ctx.author.display_name, icon_url=ctx.author.display_avatar.url)
 			embed.set_thumbnail(url=self.client.user.display_avatar.url)
 			embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-			embed.add_field(name="<:icon_supp:938970921702678548> Usage",value = '''
+			embed.add_field(name="<:icon_usage:947347839518920714> Usage",value = '''
 **```
 &slotlist
 ```**
 ''')
-			embed.add_field(name="<:icon_supp:938970921702678548> Aliases",value = '''
+			embed.add_field(name="<:icon_alias:947347903511404555> Aliases",value = '''
 **```
 sl,slot
 ```**

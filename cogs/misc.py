@@ -3,6 +3,7 @@ from discord.ext import menus
 import discord
 from discord.ext import commands
 import psutil
+import datetime,time
 
 class MySource(menus.ListPageSource):
     async def format_page(self, menu, entries):
@@ -62,6 +63,11 @@ class misc(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        global startTime
+        startTime = time.time()
 
     @commands.command(name='serverlist',aliases = ['servers','slist'])
     @commands.is_owner()
@@ -95,26 +101,39 @@ class misc(commands.Cog):
         await self.client.get_guild(int(guild_id)).leave()
         await ctx.send(f"I left: {guild_id}")
 
-    @commands.command(name ='stats',pass_context = True,case_insensitive = True,aliases = ['st'])
-    async def stats(self,ctx):
+    @commands.command(name ='botinfo',pass_context = True,case_insensitive = True,aliases = ['bi'])
+    async def botinfo(self,ctx):
         memory_usage = psutil.virtual_memory()[3]>>20
         memory_total = psutil.virtual_memory()[0]>>20
         cpu_usage = psutil.cpu_percent(1)
 
         member_count = sum(guild.member_count for guild in self.client.guilds)
 
-        embed = discord.Embed(title="AXOM Stats",color = discord.Colour.gold())
-        embed.add_field(name="**__Servers Info__**",value = f'''
+        embed = discord.Embed(title="AXOM Stats", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)",color = discord.Colour.gold())
+        embed.add_field(name="**<:icon_servers:947357898143588352> __Servers Info__**",value = f'''
 Total Servers : {len(self.client.guilds)}
 Total Users : {member_count}        
 ''')    
-        embed.add_field(name="**__System Stats__**",value = f'''
+        embed.add_field(name="**<:icon_system:947358360859189251> __System Stats__**",value = f'''
 CPU : {cpu_usage}% Used
 RAM : {memory_usage}/{memory_total} Used
-
-
-Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)
 ''')
+
+        embed.add_field(name="**<:icon_owner:947357468101582849> __Owner__**",value = f'''
+[AE・ARTHISHᵍᶠˣ](https://discord.com/users/315342835283001344)
+''')
+        embed.add_field(name="**<:icon_ping:947358103941300295> __Ping__**",value = f'''
+{round(self.client.latency*1000)}ms
+''')
+
+        embed.add_field(name="**<:changelog:947139030800269373> __Language__**",value = f'''
+Discord.py 2.0
+''')
+        uptime = uptime = str(datetime.timedelta(seconds=int(round(time.time()-startTime))))
+        embed.add_field(name="<:icon_clock:947357599030997043> **__Uptime__**",value = f'''
+{uptime}
+''')
+
         embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
 
         await ctx.send(embed = embed)
