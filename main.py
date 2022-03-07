@@ -24,6 +24,7 @@ intents.members = True
 #     client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', database='railway')
 #     print("connected to db")
 
+
 # client.loop.run_until_complete(create_pool())
 
 
