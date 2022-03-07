@@ -1,7 +1,6 @@
 git+https://github.com/Rapptz/discord.py@45d498c
 git+https://github.com/Rapptz/discord-ext-menus
 Pillow
-asyncio
 asyncpg
 pandas
 psutil
