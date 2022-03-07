@@ -1,8 +1,9 @@
 import discord
+from discord.ext import commands
 import os
 import json
 import asyncpg
-from discord.ext import commands
+
 
 with open("config.json",'r') as configjsonFile:
     configData=json.load(configjsonFile)
