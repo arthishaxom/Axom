@@ -50,6 +50,7 @@ class Leaderboard(commands.Cog):
             await ctx.send("**`Send Slotlist`**")
             try:
                 msg = await self.client.wait_for("message", timeout=120, check=check)
+                slotlist = msg.content
             except asyncio.TimeoutError:
                 embed = discord.Embed(title = f'TIMEOUT !!!',description = f'Reply Faster Next Time',color = discord.Colour.red())
                 await ctx.send(embed = embed)
@@ -60,7 +61,6 @@ class Leaderboard(commands.Cog):
             embed = discord.Embed(title = f'SOME ERROR OCCURED !!!',description = f'The Error : \n{e}',color = discord.Colour.red())
             await ctx.send(embed = embed)
             return
-        slotlist = msg.content
         await ctx.send('''**`Type Delimiter : 
 For Example : 3) TEAM XYZ
 Here, ) Is The Delimeter`**''')
