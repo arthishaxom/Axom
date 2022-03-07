@@ -109,31 +109,31 @@ class misc(commands.Cog):
 
         member_count = sum(guild.member_count for guild in self.client.guilds)
 
-        embed = discord.Embed(title="Axom Statistics", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)",color = discord.Colour.gold())
-        embed.add_field(name="**<:icon_servers:947357898143588352> Servers Info**",value = f'''
+        embed = discord.Embed(title="AXOM Stats", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)",color = discord.Colour.gold())
+        embed.add_field(name="**<:icon_servers:947357898143588352> __Servers Info__**",value = f'''
 Total Servers : {len(self.client.guilds)}
 Total Users : {member_count}        
 ''')    
-        embed.add_field(name="**<:icon_system:947358360859189251> System Stats**",value = f'''
+        embed.add_field(name="**<:icon_system:947358360859189251> __System Stats__**",value = f'''
 CPU : {cpu_usage}% Used
 RAM : {memory_usage}/{memory_total} Used
 ''')
 
-        embed.add_field(name="**<:icon_owner:947357468101582849> Owner**",value = f'''
+        embed.add_field(name="**<:icon_owner:947357468101582849> __Owner__**",value = f'''
 [AE・ARTHISHᵍᶠˣ](https://discord.com/users/315342835283001344)
 ''')
-        embed.add_field(name="**<:icon_ping:947358103941300295> Ping**",value = f'''
+        embed.add_field(name="**<:icon_ping:947358103941300295> __Ping__**",value = f'''
 {round(self.client.latency*1000)}ms
 ''')
 
+        embed.add_field(name="**<:changelog:947139030800269373> __Language__**",value = f'''
+Discord.py 2.0
+''')
         uptime = uptime = str(datetime.timedelta(seconds=int(round(time.time()-startTime))))
-        embed.add_field(name="<:icon_clock:947357599030997043> **Uptime**",value = f'''
+        embed.add_field(name="<:icon_clock:947357599030997043> **__Uptime__**",value = f'''
 {uptime}
 ''')
 
-        embed.add_field(name="**<:changelog:947139030800269373> Made In**",value = f'''
-Discord.py 2.0
-''')
         embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
 
         await ctx.send(embed = embed)
