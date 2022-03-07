@@ -6,3 +6,4 @@ asyncpg
 pandas
 psutil
 requests
+jishaku
