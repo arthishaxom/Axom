@@ -3,6 +3,7 @@ import os
 import json
 import asyncpg
 from discord.ext import commands
+import jishaku
 
 with open("config.json",'r') as configjsonFile:
     configData=json.load(configjsonFile)
@@ -42,6 +43,8 @@ async def unloadcog(ctx,extension):
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
+
+client.load_extension('jishaku')
 
 @client.command()
 async def test(ctx, arg):
