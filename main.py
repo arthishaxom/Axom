@@ -3,11 +3,15 @@ from discord.ext import commands
 import os
 import json
 import asyncpg
-
+import jishaku
 
 with open("config.json",'r') as configjsonFile:
     configData=json.load(configjsonFile)
     TOKEN=configData["DISCORD_TOKEN"]
+
+intents = discord.Intents.default()
+intents.message_content = True
+intents.members = True
 
 times_used = 0
 activity = discord.Activity(type = discord.ActivityType.watching, name="Leaderboards & Points")
@@ -15,10 +19,6 @@ client = commands.Bot(command_prefix='&',activity=activity,strip_after_prefix = 
 client.remove_command("help")
 
 
-
-
-intents = discord.Intents.default()
-intents.members = True
 
 # async def create_pool():
 #     # client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', db='railway')
@@ -44,6 +44,8 @@ async def unloadcog(ctx,extension):
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py'):
         client.load_extension(f'cogs.{filename[:-3]}')
+
+client.load_extension('jishaku')
 
 @client.command()
 async def test(ctx, arg):
