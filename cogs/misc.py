@@ -3,15 +3,18 @@ from discord.ext import menus
 import discord
 from discord.ext import commands
 import psutil
-import datetime,time
+import datetime
+import time
+
 
 class MySource(menus.ListPageSource):
     async def format_page(self, menu, entries):
         embed = discord.Embed(
-            description=f"{entries}", 
+            description=f"{entries}",
             color=discord.Colour.gold())
         embed.set_footer(text=f"Requested by {menu.ctx.author}")
         return embed
+
 
 class MyMenuPages(ui.View, menus.MenuPages):
     def __init__(self, source):
@@ -59,28 +62,29 @@ class MyMenuPages(ui.View, menus.MenuPages):
     async def last_page(self, button, interaction):
         await self.show_page(self._source.get_max_pages() - 1)
 
+
 class misc(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-    
+
     @commands.Cog.listener()
     async def on_ready(self):
         global startTime
         startTime = time.time()
 
-    @commands.command(name='serverlist',aliases = ['servers','slist'])
+    @commands.command(name='serverlist', aliases=['servers', 'slist'])
     @commands.is_owner()
-    async def serverlist(self,ctx):
+    async def serverlist(self, ctx):
         serverlist = []
         i = 0
         for guild in self.client.guilds:
-            i+=1
+            i += 1
             e = f"` {str(i)} ` - {guild.name} : `{guild.id}`"
             serverlist.append(e)
 
         total_servers = len(serverlist)
-        serverlist = [serverlist[i:i+10] for i in range(0,total_servers,10)]
+        serverlist = [serverlist[i:i+10] for i in range(0, total_servers, 10)]
 
         serverlist_strings = []
         for i in range(len(serverlist)):
@@ -92,7 +96,7 @@ class misc(commands.Cog):
         await menu.start(ctx)
 
     @commands.command()
-    async def ping(self,ctx):
+    async def ping(self, ctx):
         await ctx.send(f"My Ping : `{round(self.client.latency*1000)}ms` <:icon_ping:938972151510360125>\nThis Means Alive...Right?")
 
     @commands.command()
@@ -101,43 +105,48 @@ class misc(commands.Cog):
         await self.client.get_guild(int(guild_id)).leave()
         await ctx.send(f"I left: {guild_id}")
 
-    @commands.command(name ='botinfo',pass_context = True,case_insensitive = True,aliases = ['bi'])
-    async def botinfo(self,ctx):
-        memory_usage = psutil.virtual_memory()[3]>>20
-        memory_total = psutil.virtual_memory()[0]>>20
+    @commands.command(name='botinfo', pass_context=True, case_insensitive=True, aliases=['bi'])
+    async def botinfo(self, ctx):
+        memory_usage = psutil.virtual_memory()[3] >> 20
+        memory_total = psutil.virtual_memory()[0] >> 20
         cpu_usage = psutil.cpu_percent(1)
 
         member_count = sum(guild.member_count for guild in self.client.guilds)
 
-        embed = discord.Embed(title="AXOM Stats", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)",color = discord.Colour.gold())
-        embed.add_field(name="**<:icon_servers:947357898143588352> __Servers Info__**",value = f'''
+        embed = discord.Embed(
+            title="AXOM Stats", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)", color=discord.Colour.gold())
+        embed.add_field(name="**<:icon_servers:947357898143588352> Servers Info**", value=f'''
 Total Servers : {len(self.client.guilds)}
 Total Users : {member_count}        
-''')    
-        embed.add_field(name="**<:icon_system:947358360859189251> __System Stats__**",value = f'''
+''')
+        embed.add_field(name="**<:icon_system:947358360859189251> System Stats**", value=f'''
 CPU : {cpu_usage}% Used
 RAM : {memory_usage}/{memory_total} Used
 ''')
 
-        embed.add_field(name="**<:icon_owner:947357468101582849> __Owner__**",value = f'''
+        embed.add_field(name="**<:icon_owner:947357468101582849> Owner**", value=f'''
 [AE・ARTHISHᵍᶠˣ](https://discord.com/users/315342835283001344)
 ''')
-        embed.add_field(name="**<:icon_ping:947358103941300295> __Ping__**",value = f'''
+        embed.add_field(name="**<:icon_ping:947358103941300295> Ping**", value=f'''
 {round(self.client.latency*1000)}ms
 ''')
 
-        embed.add_field(name="**<:changelog:947139030800269373> __Language__**",value = f'''
-Discord.py 2.0
-''')
-        uptime = uptime = str(datetime.timedelta(seconds=int(round(time.time()-startTime))))
-        embed.add_field(name="<:icon_clock:947357599030997043> **__Uptime__**",value = f'''
+        uptime = uptime = str(datetime.timedelta(
+            seconds=int(round(time.time()-startTime))))
+        embed.add_field(name="<:icon_clock:947357599030997043> **Uptime**", value=f'''
 {uptime}
 ''')
 
-        embed.set_footer(text = "Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
+        embed.add_field(name="**<:changelog:947139030800269373> Made In**", value=f'''
+Discord.py 2.0
+''')
+        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
 
-        await ctx.send(embed = embed)
+        await ctx.send(embed=embed)
 
+    @commands.command(name='source', pass_context=True, case_insensitive=True, aliases=['src'])
+    async def source(self, ctx):
+        await ctx.send("https://c.tenor.com/UK49dL7MKmkAAAAC/dil-se-bura-lagta-hai-bhai-please-bhai-looks-heartbreaking.gif")
 
 
 def setup(client):
