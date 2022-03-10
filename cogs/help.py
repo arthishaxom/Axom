@@ -19,12 +19,12 @@ class help(commands.Cog):
         embed.add_field(name="<:leaderb:947178467156430868> Leaderboard Commands", value='''
 **```
 leaderboard,newcalculate,
-ptsetup,slotlist,source
+ptsetup,slotlist
 ```**
 ''')
         embed.add_field(name='<:box:947178898553204736> Misc Commands', value='''
 **```
-ping,preview,botinfo  
+ping,preview,botinfo,source
 ```**
 ''')
         embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value='''
