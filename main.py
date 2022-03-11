@@ -10,7 +10,7 @@ with open("config.json", 'r') as configjsonFile:
     TOKEN = configData["DISCORD_TOKEN"]
 
 intents = discord.Intents.default()
-#intents.message_content = True
+intents.message_content = True
 intents.members = True
 
 times_used = 0
