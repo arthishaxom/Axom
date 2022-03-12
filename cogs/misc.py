@@ -111,7 +111,7 @@ class misc(commands.Cog):
         memory_total = psutil.virtual_memory()[0] >> 20
         cpu_usage = psutil.cpu_percent(1)
 
-        member_count = sum(guild.member_count for guild in self.client.guilds)
+        member_count = sum(guild.member_count for guild in self.client.guilds if guild.member_count != None)
 
         embed = discord.Embed(
             title="AXOM Stats", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)", color=discord.Colour.gold())
