@@ -18,7 +18,7 @@ class help(commands.Cog):
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
         embed.add_field(name="<:leaderb:947178467156430868> Leaderboard Commands", value='''
 **```
-leaderboard,newcalculate,
+leaderboard,ncalculate,
 ptsetup,slotlist
 ```**
 ''')
@@ -75,7 +75,7 @@ prev,pv
 ''')
         await ctx.send(embed=embed)
 
-    @help.command(name='newcalculate', pass_context=True, case_insensitive=True, aliases=['ncalc'])
+    @help.command(name='ncalculate', pass_context=True, case_insensitive=True, aliases=['ncalc'])
     async def newcalculate(self, ctx):
         embed = discord.Embed(title="Newcalculate", description="Calculate Points Of Matches & Give In Format Such That Can Be Used In Leaderboard Command\n<a:excla_blue:939127974878380042> | Currently We Only Support BGMI Points System", color=discord.Colour.gold())
         embed.set_author(name=ctx.author.display_name,
@@ -84,7 +84,7 @@ prev,pv
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
         embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
 **```
-&newcalculate
+&ncalculate
 ```**
 ''')
         embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
