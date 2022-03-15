@@ -77,7 +77,7 @@ prev,pv
 
     @help.command(name='ncalculate', pass_context=True, case_insensitive=True, aliases=['ncalc'])
     async def newcalculate(self, ctx):
-        embed = discord.Embed(title="Newcalculate", description="Calculate Points Of Matches & Give In Format Such That Can Be Used In Leaderboard Command\n<a:excla_blue:939127974878380042> | Currently We Only Support BGMI Points System", color=discord.Colour.gold())
+        embed = discord.Embed(title="ncalculate", description="Calculate Points Of Matches & Give In Format Such That Can Be Used In Leaderboard Command\n<a:excla_blue:939127974878380042> | Currently We Only Support BGMI Points System", color=discord.Colour.gold())
         embed.set_author(name=ctx.author.display_name,
                          icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=self.client.user.display_avatar.url)
