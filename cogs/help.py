@@ -214,7 +214,7 @@ tunhide,tuh
 **```
 &tourneyhide
 ```**
-<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID
+<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID 
 ''')
         embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
 **```
