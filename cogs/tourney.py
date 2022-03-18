@@ -30,7 +30,7 @@ class tourney(commands.Cog):
         if view.value == "No":
             view.clear_items()
             no_embed = discord.Embed(
-                title="I Won't Be Able To Proceed Without It.", color=discord.Colour.red())
+                title="I Won't Be Able To Proceed Without It !!!", color=discord.Colour.red())
             await embed_ques.edit(embed=no_embed, view=view)
             return
         if view.value == "Yes":

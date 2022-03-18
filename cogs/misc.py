@@ -6,7 +6,6 @@ import psutil
 import datetime
 import time
 
-
 class MySource(menus.ListPageSource):
     async def format_page(self, menu, entries):
         embed = discord.Embed(
