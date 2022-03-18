@@ -68,7 +68,7 @@ class tourney(commands.Cog):
         tcategory = category
 
         ques_embed = discord.Embed(title=f"<:stary:946641691752935454> Half-Way There <a:icon_loading:939409269978177546>",
-                                   description=f"Go To The Category Settings Of the Category Just Created ` [Will Be At Last] ` & Turn On <:turn_on:946698850901577789> The `Manage Permissions` For <@908949899645706241>.\n> Press **Yes** Button After You Have Done It.", color=discord.Colour.gold())
+                                   description=f"Go To The Category Settings Of the Category Just Created ` [Will Be At Last] ` & Turn On <:turn_on:946698850901577789> The `Manage Permissions` For {self.client.user.mention}.\n> Press **Yes** Button After You Have Done It.", color=discord.Colour.gold())
         view = MyView(ctx)
         ques_embed = await embed_ques.edit(embed=ques_embed, view=view)
 
