@@ -16,14 +16,14 @@ class help(commands.Cog):
                          icon_url=ctx.author.display_avatar.url)
         embed.set_thumbnail(url=self.client.user.display_avatar.url)
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:leaderb:947178467156430868> Leaderboard Commands", value='''
+        embed.add_field(name="<:awardicon:954265063907283005> Tourney Helper Commands", value='''
 **```
 tourneychannels,tourneydelete,
 tourneyunhide,tourneyhide,
 tourneyinfo
 ```**
 ''')
-        embed.add_field(name="<:awardicon:954265063907283005> Tourney Helper Commands", value='''
+        embed.add_field(name="<:leaderb:947178467156430868> Leaderboard Commands", value='''
 **```
 leaderboard,newcalculate,
 ptsetup,slotlist
