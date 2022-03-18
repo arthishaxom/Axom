@@ -170,8 +170,9 @@ tchannels,tc
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
         embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
 **```
-&tourneydelete
+&tourneydelete <category_id>
 ```**
+<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID
 ''')
         embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
 **```
@@ -192,6 +193,7 @@ tdelete,td
 **```
 &tourneyunhide
 ```**
+<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID
 ''')
         embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
 **```
@@ -212,6 +214,7 @@ tunhide,tuh
 **```
 &tourneyhide
 ```**
+<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID
 ''')
         embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
 **```
