@@ -532,5 +532,5 @@ Example - ` 2000,1000,500,500mvp `**
             await info_channel.send(embed=tinfo_embed)
 
 
-def setup(client):
-    client.add_cog(tourney(client))
+async def setup(client):
+    await client.add_cog(tourney(client))

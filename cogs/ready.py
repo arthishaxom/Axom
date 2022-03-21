@@ -3,7 +3,9 @@ import discord
 from discord import channel
 from discord.ext import commands, tasks
 import re
-import datetime,time
+import datetime
+import time
+
 
 class Ready(commands.Cog):
 
@@ -20,11 +22,12 @@ class Ready(commands.Cog):
         print("SAB SAHI HAI BIDU")
 
     @commands.Cog.listener()
-    async def on_guild_join(self,guild):
-        embed = discord.Embed(title = "Thanks For Inviting Axom!",description = "`AXOM` Is A New Bot And Is Open For Suggestions, Kindly Join This Server If You Need Help/Have Any Query : \n> [Axom Support](https://discord.gg/uW7WXxBtBW)")
+    async def on_guild_join(self, guild):
+        embed = discord.Embed(title="Thanks For Inviting Axom!",
+                              description="`AXOM` Is A New Bot And Is Open For Suggestions, Kindly Join This Server If You Need Help/Have Any Query : \n> [Axom Support](https://discord.gg/uW7WXxBtBW)")
         try:
-            bot_entry = await guild.audit_logs(action = discord.AuditLogAction.bot_add).flatten()
-            await bot_entry[0].user.send(embed = embed)
+            bot_entry = await guild.audit_logs(action=discord.AuditLogAction.bot_add).flatten()
+            await bot_entry[0].user.send(embed=embed)
         except:
             return
 
@@ -36,10 +39,11 @@ class Ready(commands.Cog):
     #     await self.client.db.execute("DROP TABLE IF EXISTS test1")
 
     @commands.Cog.listener()
-    async def on_message(self,message: discord.Message) -> None:
-        if re.fullmatch(rf"<@!?{self.client.user.id}>",message.content):
+    async def on_message(self, message: discord.Message) -> None:
+        if re.fullmatch(rf"<@!?{self.client.user.id}>", message.content):
             await message.channel.send(f"My prefix is `&`")
             return
 
-def setup(client):
-    client.add_cog(Ready(client))
+
+async def setup(client):
+    await client.add_cog(Ready(client))

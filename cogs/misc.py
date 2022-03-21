@@ -6,6 +6,7 @@ import psutil
 import datetime
 import time
 
+
 class MySource(menus.ListPageSource):
     async def format_page(self, menu, entries):
         embed = discord.Embed(
@@ -110,7 +111,8 @@ class misc(commands.Cog):
         memory_total = psutil.virtual_memory()[0] >> 20
         cpu_usage = psutil.cpu_percent(1)
 
-        member_count = sum(guild.member_count for guild in self.client.guilds if guild.member_count != None)
+        member_count = sum(
+            guild.member_count for guild in self.client.guilds if guild.member_count != None)
 
         embed = discord.Embed(
             title="AXOM Stats", description="Emoji Credits | [Icons Server](https://discord.gg/3aHwMpsDgS)", color=discord.Colour.gold())
@@ -148,5 +150,5 @@ Discord.py 2.0
         await ctx.send("https://c.tenor.com/UK49dL7MKmkAAAAC/dil-se-bura-lagta-hai-bhai-please-bhai-looks-heartbreaking.gif")
 
 
-def setup(client):
-    client.add_cog(misc(client))
+async def setup(client):
+    await client.add_cog(misc(client))
