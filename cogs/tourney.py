@@ -11,7 +11,7 @@ class tourney(commands.Cog):
 
     @commands.command(name="tourneychannels", aliases=["tchannels", "tc"], case_insensitive=True)
     @commands.bot_has_permissions(manage_roles=True, manage_permissions=True, manage_channels=True, manage_messages=True, embed_links=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
     async def tourneychannels(self, ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -131,7 +131,7 @@ class tourney(commands.Cog):
 
     @commands.command(name="tourneydelete", aliases=["tdelete", "td"], case_insensitive=True)
     @commands.bot_has_permissions(manage_permissions=True, manage_channels=True, manage_messages=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
     async def tourneydelete(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -179,7 +179,7 @@ class tourney(commands.Cog):
 
     @commands.command(name="tourneyunhide", aliases=["tunhide", "tuh"], case_insensitive=True)
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
     async def tourneyunhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -228,7 +228,7 @@ class tourney(commands.Cog):
 
     @commands.command(name="tourneyhide", aliases=["thide", "th"], case_insensitive=True)
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
     async def tourneyhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
