@@ -104,7 +104,7 @@ class tourney(commands.Cog):
 
         overwrites = {
             ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False, connect=True, read_message_history=True),
-            guild.me: discord.PermissionOverwrite(manage_permissions=True, manage_channels=True, read_messages=True,
+            guild.me: discord.PermissionOverwrite(manage_channels=True, read_messages=True,
                                                   attach_files=True, embed_links=True, send_messages=True, connect=True, read_message_history=True)
         }
         # overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False, connect=True, read_message_history=True),guild.me: discord.PermissionOverwrite(manage_permissions=True, manage_channels=True, read_messages=True,attach_files=True, embed_links=True, send_messages=True, connect=True, read_message_history=True)}

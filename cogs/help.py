@@ -36,7 +36,7 @@ ping,preview,source
 ''')
         embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value='''
 **<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
-<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=908949899645706241&permissions=2952916049&scope=bot%20applications.commands)
+<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=880314360017338380&permissions=805432529&scope=bot)
 <:like:947180731656994866> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
 **
 ''')
