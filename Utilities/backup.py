@@ -1,3 +1,4 @@
+from pipes import Template
 import discord
 from discord.ui import Button, View
 from discord.ext import commands
@@ -5,6 +6,60 @@ import asyncio
 import os
 import pandas as pd
 import csv
+from Utilities.BotColoursInfo import BotColours
+
+
+# class DropdownView(discord.ui.View):
+#     def __init__(self, teamlist):
+#         super().__init__(timeout=5)
+#         self.add_item(Dropdown(teamlist))
+
+#     async def on_timeout(self):
+#         return
+class Dropdown(discord.ui.Select):
+    def __init__(self, teamlist):
+
+        # Set the options that will be presented inside the dropdown
+        # global options
+        options = []
+        for i in range(len(teamlist)):
+            teamn = teamlist[i]
+            teamname = discord.SelectOption(
+                label=f'{teamn}')
+            options.append(teamname)
+        super().__init__(placeholder='Choose your Team',
+                         min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        # opt = discord.utils.get(self.options, label=self.values[0])
+        # self.options.remove(opt)
+        self.view.value = self.values[0]
+        await interaction.message.delete()
+        self.view.stop()
+
+
+class MySelectView(View):
+    def __init__(self, ctx, teamlist):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.value = None
+        self.add_item(Dropdown(teamlist))
+
+    @discord.ui.button(label="Save", style=discord.ButtonStyle.green)
+    async def button_callback(self, button, interaction):
+        await interaction.response.edit_message(view=self)
+        self.value = "save"
+        self.stop()
+
+    @discord.ui.button(label="Skip", style=discord.ButtonStyle.grey)
+    async def no_button_callback(self, button, interaction):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
+        self.value = "skip"
+        self.stop()
+
+    async def on_timeout(self):
+        return
 
 
 class MyView(View):
@@ -30,15 +85,17 @@ class MyView(View):
         return
 
 
-class newcalc(commands.Cog):
+class Points(commands.Cog):
 
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name='ncalculate', aliases=['ncalc'], case_insensitive=True)
+    @commands.command(name='calculate1', aliases=["calc1", "c1"], case_insensitive=True, help='''
+Quickly Calculate Points Of Unlimited Matches. Use calculate2 If You Are Having Trouble Undersanding The Process.
+''')
     @commands.bot_has_permissions(manage_messages=True, embed_links=True)
     @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
-    async def ncalculate(self, ctx):
+    async def calculate1(self, ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
 
@@ -365,5 +422,181 @@ __Example__ :
                 os.remove(f"{server_name}match{i+1}.csv")
 
 
+# TODO Calculate Points Command #2 = c2
+
+
+    @commands.command(name='calculate2', aliases=["c2", "calc2"], case_insensitive=True, help='''
+Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People Who Dont Understand Calculate1 Method
+''')
+    @commands.bot_has_permissions(manage_messages=True, embed_links=True)
+    @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
+    async def calculate2(self, ctx):
+        def check(msg):
+            return msg.author == ctx.author and msg.channel == ctx.channel
+        embed3 = discord.Embed(
+            title="NUMBER OF MATCHES", description="Send The Number Of Matches.", color=discord.Colour.gold())
+        await ctx.send(embed=embed3)
+        # try:
+        #     NoOfMatchesRaw = await self.client.wait_for("message", timeout=120, check=check)
+        # except asyncio.TimeoutError:
+        #     await NoOfMatchesRaw.delete()
+        #     embed = discord.Embed(
+        #         title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+        #     await ctx.send(embed=embed)
+        #     return
+        # try:
+        #     NoOfMatches = int(NoOfMatchesRaw.content)
+        # except Exception as e:
+        #     await ctx.send("`NUMBER BHEJIYE GURUDEV`")
+        #     await NoOfMatchesRaw.add_reaction("❌")
+        #     return
+        # await NoOfMatchesRaw.delete()
+
+        server_nname = ctx.message.guild.name
+        server_name = ''
+        for i in server_nname:
+            if i.isalnum():
+                server_name += i
+
+        AskSlotlistEmbed = discord.Embed(
+            title="<:icon_usage:947347839518920714> Send The Slotlist.", color=BotColours.main())
+        AskSlotlist = await ctx.send(embed=AskSlotlistEmbed)
+        try:
+            SlotlistObject = await self.client.wait_for("message", timeout=15, check=check)
+            SlotlistRaw = SlotlistObject.content
+        except asyncio.TimeoutError:
+            embed = discord.Embed(
+                title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+            await AskSlotlist.edit(embed=embed)
+            return
+        await AskSlotlist.delete()
+        await SlotlistObject.delete()
+        SlotlistLineSplit = SlotlistRaw.splitlines()
+        if '@' in SlotlistLineSplit[0]:
+            SlotlistOnly = []
+            for Val in SlotlistLineSplit:
+                if "@" in Val:
+                    ele = i.split("@")
+                    SlotlistOnly.append(ele[0])
+        else:
+            SlotlistOnly = SlotlistLineSplit
+        print(SlotlistOnly)
+        SlotlistFinal = []
+        for i in [')', '=>', '>', '|']:
+            for team in SlotlistOnly:
+                if i in team:
+                    ele = ((team.split(i))[1].strip())
+                    SlotlistFinal.append(ele)
+        print(SlotlistFinal)
+        column_names = [f'teamname',
+                        f'position1', f'kills1', f"cd1"]
+        with open(f"{server_name}match1.csv", "w+") as csvf:
+            csvw = csv.writer(csvf)
+            csvw.writerow(column_names)
+        df = pd.read_csv(f"{server_name}match1.csv")
+
+        macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+        mapos = {1: 15, 2: 12, 3: 10, 4: 8, 5: 6, 6: 4, 7: 2, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1,
+                 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+
+        TeamList = SlotlistFinal
+        TeamRank = 1
+
+        for i in range(len(TeamList)):
+
+            embed1 = discord.Embed(
+                title=f"<:icon_usage:947347839518920714> Choose The #{TeamRank} Team", color=BotColours.main())
+            view = MySelectView(ctx, TeamList)
+            MainEmbed = await ctx.send(embed=embed1, view=view)
+            res = await view.wait()
+            if res:
+                view.clear_items()
+                error_embed = discord.Embed(
+                    title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+                await MainEmbed.edit(embed=error_embed, view=view)
+                return
+            if view.value in TeamList:
+                try:
+                    embed2 = discord.Embed(
+                        title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
+                    embed_obj = await ctx.send(embed=embed2)
+                    TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
+                    TeamKills = int(TeamKillsQues.content)
+                    print(view.value)
+
+                    TeamName = view.value
+                    TeamPosPts = mapos[TeamRank]
+                    TeamKillsPts = TeamKills
+                    TeamWwcd = macd[TeamRank]
+
+                    df.loc[i] = [TeamName, TeamPosPts,
+                                 TeamKillsPts, TeamWwcd]
+
+                    TeamList.remove(view.value)
+                    print(TeamList)
+                    TeamRank += 1
+                    await TeamKillsQues.delete()
+                    await embed_obj.delete()
+                except asyncio.TimeoutError:
+                    await TeamKillsQues.delete()
+                    timeup_embed = discord.Embed(
+                        title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
+                    await ctx.send(embed=timeup_embed)
+                    return
+            else:
+                if view.value == "skip":
+                    await MainEmbed.delete()
+                    print("skipped")
+                    TeamRank += 1
+                else:
+                    print("Starting With : ", TeamList)
+                    await MainEmbed.delete()
+                    for i in TeamList:
+                        print("Team Added : ", i)
+                        df.loc[TeamRank] = [i, 0,
+                                            0, 0]
+                        # TeamList.remove(i)
+                        print(TeamList)
+                        TeamRank += 1
+                    break
+
+        if TeamList != []:
+            for i in TeamList:
+                df.loc[TeamRank] = [i, 0, 0, 0]
+                TeamRank += 1
+
+        df.to_csv(f"{server_name}match1.csv", index=False)
+
+        df1 = pd.read_csv(f"{server_name}match1.csv")
+        col_to_sum = ['position1', 'kills1']
+        df1["total1"] = df1[col_to_sum].sum(axis=1)
+        df1.sort_values(
+            by=["total1", "cd1", "position1", "kills1"], ascending=False, inplace=True)
+
+        valteams = df1["teamname"].to_list()
+        valcds = df1["cd1"].to_list()
+        valposs = df1["position1"].to_list()
+        valkillrs = df1["kills1"].to_list()
+        valtotals = df1["total1"].to_list()
+
+        valteamsl = ",".join(valteams)
+        valcdc = [str(ele) for ele in valcds]
+        valcdsl = ",".join(valcdc)
+        valpossc = [str(ele) for ele in valposs]
+        valpossl = ",".join(valpossc)
+        valkillrsc = [str(ele) for ele in valkillrs]
+        valkillrsl = ",".join(valkillrsc)
+        valtotalsc = [str(ele) for ele in valtotals]
+        valtotalsl = ",".join(valtotalsc)
+
+        embed6 = discord.Embed(
+            description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=discord.Colour.gold())
+        embed6.set_footer(text="HOLD TO COPY | USE &lb TO LEADERBOARD")
+        await ctx.send(embed=embed6)
+        os.remove(f"{server_name}match1.csv")
+
+
 async def setup(client):
-    await client.add_cog(newcalc(client))
+    await client.add_cog(Points(client))
+    

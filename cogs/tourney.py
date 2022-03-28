@@ -4,14 +4,14 @@ from discord.ext import commands
 from Utilities.buttons_view import MyView
 
 
-class tourney(commands.Cog):
+class TourneyHelpers(commands.Cog):
 
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name="tourneychannels", aliases=["tchannels", "tc"], case_insensitive=True)
+    @commands.command(name="tourneychannels", aliases=["tchannels", "tc"], case_insensitive=True, help="Quickly Create Tourney channels")
     @commands.bot_has_permissions(manage_roles=True, manage_permissions=True, manage_channels=True, manage_messages=True, embed_links=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneychannels(self, ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -30,7 +30,7 @@ class tourney(commands.Cog):
         if view.value == "No":
             view.clear_items()
             no_embed = discord.Embed(
-                title="I Won't Be Able To Proceed Without It !!!", color=discord.Colour.red())
+                title="I Won't Be Able To Proceed Without It.", color=discord.Colour.red())
             await embed_ques.edit(embed=no_embed, view=view)
             return
         if view.value == "Yes":
@@ -127,11 +127,12 @@ class tourney(commands.Cog):
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
                                   description=f'The Error : \n{e}', color=discord.Colour.red())
             await ctx.send(embed=embed)
+            raise e
             return
 
-    @commands.command(name="tourneydelete", aliases=["tdelete", "td"], case_insensitive=True)
+    @commands.command(name="tourneydelete", aliases=["tdelete", "td"], case_insensitive=True, help="Deletes The Channel Of A Category")
     @commands.bot_has_permissions(manage_permissions=True, manage_channels=True, manage_messages=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneydelete(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -177,9 +178,9 @@ class tourney(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-    @commands.command(name="tourneyunhide", aliases=["tunhide", "tuh"], case_insensitive=True)
+    @commands.command(name="tourneyunhide", aliases=["tunhide", "tuh"], case_insensitive=True, help="Unhides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
     async def tourneyunhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -226,9 +227,9 @@ class tourney(commands.Cog):
             await ctx.send(embed=embed)
             return
 
-    @commands.command(name="tourneyhide", aliases=["thide", "th"], case_insensitive=True)
+    @commands.command(name="tourneyhide", aliases=["thide", "th"], case_insensitive=True, help="Hides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True, manage_channels=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
     async def tourneyhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -256,7 +257,7 @@ class tourney(commands.Cog):
             await sent_embed.edit(embed=embed)
             return
 
-    @ commands.command(name="tourneyinfo", aliases=["tinfo", "ti"], case_insensitive=True)
+    @ commands.command(name="tourneyinfo", aliases=["tinfo", "ti"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
     @ commands.bot_has_permissions(manage_messages=True, embed_links=True)
     @ commands.check_any(commands.has_permissions(manage_guild=True, manage_messages=True), commands.is_owner())
     async def tourneyinfo(self, ctx):
@@ -533,4 +534,4 @@ Example - ` 2000,1000,500,500mvp `**
 
 
 async def setup(client):
-    await client.add_cog(tourney(client))
+    await client.add_cog(TourneyHelpers(client))

@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 from discord.ext.commands.core import bot_has_permissions
 from discord.utils import get
-from Functions.helpful_lb import top20, top25
+from Utilities.helpful_lb import top20, top25
 
 
 class Leaderboard(commands.Cog):
@@ -13,9 +13,9 @@ class Leaderboard(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(name='ptsetup', aliases=['pts'], case_insensitive=True)
+    @commands.command(name='ptsetup', aliases=['pts'], case_insensitive=True, help="Makes A Role `PT-Mod`, People With This Role Can Use Leaderboard Command Even If They Don't Have Manage_Messages Perms.")
     @commands.bot_has_permissions(manage_roles=True)
-    @commands.has_permissions(manage_guild=True, manage_roles=True)
+    @commands.check_any(commands.has_permissions(manage_roles=True), commands.has_role('PT-Mod'), commands.is_owner())
     async def _ptsetup(self, ctx):
         guilded = ctx.guild
         if get(ctx.guild.roles, name="PT-Mod"):
@@ -23,11 +23,10 @@ class Leaderboard(commands.Cog):
             return
         else:
             await guilded.create_role(name="PT-Mod", color=discord.Colour.gold())
-            await ctx.send("Created Role!, Now People With This Role Can Use My Commands Even If They Don' Have Manage_Messages Perms.")
+            await ctx.send("Created Role!, Now People With This Role Can Use My Commands Even If They Don't Have Manage_Messages Perms.")
 
-    @commands.command(name='preview', aliases=['prev', 'pv'], case_insensitive=True)
+    @commands.command(name='preview', aliases=['prev', 'pv'], case_insensitive=True, help="Shows The Leaderboards Preview")
     @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
-    @bot_has_permissions(attach_files=True)
     async def _preview(self, ctx):
         pic = discord.Embed(title="__BOARD 1__", color=discord.Colour.gold())
         file = discord.File(r'./PREVS/BOARD-1.png')
@@ -38,59 +37,16 @@ class Leaderboard(commands.Cog):
         await ctx.send(file=file, embed=pic)
         await ctx.send(file=file2, embed=pic2)
 
-    @commands.command(name="slotlist", aliases=['sl', 'slot'], case_insensitive=True)
-    @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
-    @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
-    async def slotlist(self, ctx):
-        def check(msg):
-            return msg.author == ctx.author and msg.channel == ctx.channel
-        try:
-            msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        except:
-            await ctx.send("**`Send Slotlist`**")
-            try:
-                msg = await self.client.wait_for("message", timeout=120, check=check)
-                slotlist = msg.content
-            except asyncio.TimeoutError:
-                embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
-                await ctx.send(embed=embed)
-                return
-        try:
-            listslot = slotlist.splitlines()
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
-        await ctx.send('''**`Type Delimiter : 
-For Example : 3) TEAM XYZ
-Here, ) Is The Delimeter`**''')
-        try:
-            input2 = await self.client.wait_for("message", timeout=120, check=check)
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
-        delimeter = input2.content
-        try:
-            listslot2 = []
-            for i in range(len(listslot)):
-                e = listslot[i].split(f'{delimeter}')
-                listslot2.append(e[0]+",,"+e[1].strip())
-            slotsmsg = "\n".join(listslot2)
-            await ctx.send(f"**`{slotsmsg}`**")
-            nlist = ["1,,", "2,,", "3,,", "4,,", "5,,", "6,,", "7,,", "8,,", "9,,", "10,,", "11,,", "12,,", "13,,",
-                     "14,,", "15,,", "16,,", "17,,", "18,,", "19,,", "20,,", "21,,", "22,,", "23,,", "24,,", "25,,"]
-            await ctx.send("\n".join(nlist[:len(listslot)]))
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
+    @commands.command(name="leaderboard", aliases=['leaderb', 'lb'], case_insensitive=True, help='''Makes The Leaderboards As Per This Format:
+**```
+TEAM1,TEAM2,...
+CHICKEN1,CHICKEN2,...
+POSITON1,POSTION2,...
+KILL1,KILL2,...
+TOTAL1,TOTAL2,...
+```**
 
-    @commands.command(name="leaderboard", aliases=['leaderb', 'lb'], case_insensitive=True)
+Use `&c1` Or `&c2` To Get The Points In This Format.''')
     @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
     @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())

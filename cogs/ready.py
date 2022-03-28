@@ -1,4 +1,4 @@
-from discord.ui import Button
+
 import discord
 from discord import channel
 from discord.ext import commands, tasks
@@ -14,6 +14,12 @@ class Ready(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
+        try:
+            channel = self.client.get_channel(918849166371868712)
+            await channel.send("I Am Here So What The Fear")
+        except:
+            pass
+
         print("SAB SAHI HAI BIDU")
 
     @commands.Cog.listener()
@@ -35,9 +41,10 @@ class Ready(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        if re.fullmatch(rf"<@!?{self.client.user.id}>", message.content):
-            await message.channel.send(f"My prefix is `&`")
-            return
+        if message.author == self.client.user:
+            if re.fullmatch(rf"<@!?{self.client.user.id}>", message.content):
+                await message.channel.send(f"My prefix is `&`")
+                return
 
 
 async def setup(client):

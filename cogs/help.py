@@ -1,248 +1,64 @@
+from click import command
 import discord
 from discord.ext import commands
+from Utilities.BotColoursInfo import BotColours
 
 
-class help(commands.Cog):
+class AxomHelp(commands.MinimalHelpCommand):
 
-    def __init__(self, client):
-        self.client = client
+    def get_command_signature(self, command):
+        return command.qualified_name
 
-    @commands.group(name="help", pass_context=True, invoke_without_command=True, case_insensitive=True, aliases=['h', 'Help', 'HELP'])
-    async def help(self, ctx):
+    def get_syntax(self, command):
+        return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
 
-        embed = discord.Embed(title="Axom | Command List",
-                              description="<:line_top:947143646334042122> My Prefix Is `&`\n<:line_bottom:947143905810473050> I Am A Bot For Calculating Games Points & Making Leaderboards.", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
+    async def send_bot_help(self, mapping):
+        embed = discord.Embed(title="Axom Help Section",
+                              color=BotColours.main())
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:awardicon:954265063907283005> Tourney Helper Commands", value='''
-**```
-tourneychannels,tourneydelete,
-tourneyunhide,tourneyhide,
-tourneyinfo
-```**
-''')
-        embed.add_field(name="<:leaderb:947178467156430868> Leaderboard Commands", value='''
-**```
-leaderboard,newcalculate,
-ptsetup,slotlist
-```**
-''')
-        embed.add_field(name='<:box:947178898553204736> Misc Commands', value='''
-**```
-ping,preview,source 
-```**
-''')
+        for cog, commands in mapping.items():
+            filtered = await self.filter_commands(commands, sort=False)
+            command_signatures = [
+                self.get_command_signature(c) for c in filtered]
+            if command_signatures:
+                cog_name = getattr(cog, "qualified_name", "No Category")
+                CommandsNames = "`, `".join(
+                    command_signatures)
+                embed.add_field(
+                    name=f"<:awardicon:954265063907283005> {cog_name}", value=f"\n`{CommandsNames}`\n", inline=False)
         embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value='''
 **<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
-<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=880314360017338380&permissions=805432529&scope=bot)
+<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=908949899645706241&permissions=2952916049&scope=bot%20applications.commands)
 <:like:947180731656994866> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
 **
 ''')
-        await ctx.send(embed=embed)
 
-    @help.command(name='leaderboard', pass_context=True, case_insensitive=True, aliases=['lb'])
-    async def leaderboard(self, ctx):
-        embed = discord.Embed(
-            title="Leaderboard", description="This Command Help You To Make Cool-Looking Leaderboards, Current We Only Have 2 Free Designs", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&leaderboard
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-leaderb,lb
-```**
-''')
-        await ctx.send(embed=embed)
+        channel = self.get_destination()
+        await channel.send(embed=embed)
 
-    @help.command(name='preview', pass_context=True, case_insensitive=True, aliases=['pv', 'prev'])
-    async def preview(self, ctx):
-        embed = discord.Embed(
-            title="Preview", description="Look At The Available Free Designs Using This Command ", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&preview
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-prev,pv
-```**
-''')
-        await ctx.send(embed=embed)
+    async def send_command_help(self, command):
+        CmdName = (command.qualified_name).upper()
+        embed = discord.Embed(title=CmdName,
+                              description=f">>> **{command.help}**")
+        embed.add_field(name="<:icon_usage:947347839518920714> Usage",
+                        value=f"**```\n{self.get_syntax(command)}\n```**")
+        alias = command.aliases
+        alias_text = ", ".join(alias)
+        if alias:
+            embed.add_field(
+                name="<:icon_alias:947347903511404555> Aliases", value=f"**```\n{alias_text}\n```**", inline=False)
 
-    @help.command(name='ncalculate', pass_context=True, case_insensitive=True, aliases=['ncalc'])
-    async def newcalculate(self, ctx):
-        embed = discord.Embed(title="Ncalculate", description="Calculate Points Of Matches & Give In Format Such That Can Be Used In Leaderboard Command\n<:iconwarning:946654059715244033> | Currently We Only Support BGMI Points System", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&ncalculate
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-ncalc
-```**
-''')
-        await ctx.send(embed=embed)
+        channel = self.get_destination()
+        await channel.send(embed=embed)
 
-    @help.command(name='ptsetup', pass_context=True, case_insensitive=True, aliases=['pts'])
-    async def ptsetup(self, ctx):
-        embed = discord.Embed(
-            title="Ptsetup", description="Makes A `PT-Mod` Role, People With This Role Can Use The Leaderboard Commands Even If They Dont Have The `Manage Messages` Permission", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&ptsetup
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-pts
-```**
-''')
-        await ctx.send(embed=embed)
 
-    @help.command(name='slotlist', pass_context=True, case_insensitive=True, aliases=['sl', 'slot'])
-    async def slotlist(self, ctx):
-        embed = discord.Embed(title="Slotlist", description="This Will Give You The 2 Formats To Fill Which You Will Be Using While Points Calculation: \n<:px_no1:938969002401730561> | Team Prefixes Format, To Fill With The Team Prefixes\n<:px_no2:938969171742588988> | Match Points Format, To Fill With Match Points Using The Prefixes Given In Team Prefixes Format", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&slotlist
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-sl,slot
-```**
-''')
-        await ctx.send(embed=embed)
-
-    @help.command(name='tourneychannels', pass_context=True, case_insensitive=True, aliases=["tchannels", "tc"])
-    async def tourneychannels(self, ctx):
-        embed = discord.Embed(
-            title="Tourney Channels", description="This Will Allow You To Quickly Create Tournament Channels", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&tourneychannels
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-tchannels,tc
-```**
-''')
-        await ctx.send(embed=embed)
-
-    @help.command(name='tourneydelete', pass_context=True, case_insensitive=True, aliases=["tdelete", "td"])
-    async def tourneydelete(self, ctx):
-        embed = discord.Embed(
-            title="Tourney Delete", description="This Will Allow You To DELETE Any Category With All Its Channels", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&tourneydelete <category_id>
-```**
-<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-tdelete,td
-```**
-''')
-        await ctx.send(embed=embed)
-
-    @help.command(name='tourneyunhide', pass_context=True, case_insensitive=True, aliases=["tunhide", "tuh"])
-    async def tourneyunhide(self, ctx):
-        embed = discord.Embed(
-            title="Tourney Unhide", description="This Will Allow You To UNHIDE Any Category With All Its Channels", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&tourneyunhide
-```**
-<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-tunhide,tuh
-```**
-''')
-        await ctx.send(embed=embed)
-
-    @help.command(name='tourneyhide', pass_context=True, case_insensitive=True, aliases=["thide", "th"])
-    async def tourneyhide(self, ctx):
-        embed = discord.Embed(
-            title="Tourney Hide", description="This Will Allow You To HIDE Any Category With All Its Channels", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&tourneyhide
-```**
-<:iconwarning:946654059715244033> Don't Write <> Just Replace <category_id> With Category ID 
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-thide,th
-```**
-''')
-        await ctx.send(embed=embed)
-
-    @help.command(name='tourneyinfo', pass_context=True, case_insensitive=True, aliases=["tinfo", "ti"])
-    async def tourneyinfo(self, ctx):
-        embed = discord.Embed(
-            title="Tourney Info", description="This Will Allow You To Send Info Of Your Tournament To A Channel", color=discord.Colour.gold())
-        embed.set_author(name=ctx.author.display_name,
-                         icon_url=ctx.author.display_avatar.url)
-        embed.set_thumbnail(url=self.client.user.display_avatar.url)
-        embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
-        embed.add_field(name="<:icon_usage:947347839518920714> Usage", value='''
-**```
-&tourneyinfo
-```**
-''')
-        embed.add_field(name="<:icon_alias:947347903511404555> Aliases", value='''
-**```
-tinfo,ti
-```**
-''')
-        await ctx.send(embed=embed)
+class AxomHelpCog(commands.Cog, command_attrs=dict(hidden=True)):
+    def __init__(self, client):
+        self.client = client
+        help_command = AxomHelp()
+        help_command.cog = self
+        client.help_command = help_command
 
 
 async def setup(client):
-    await client.add_cog(help(client))
+    await client.add_cog(AxomHelpCog(client))
