@@ -38,31 +38,9 @@ async def main():
         await client.load_extension('jishaku')
         await client.start(TOKEN)
 
-
-@client.command()
-@commands.is_owner()
-async def loadcog(ctx, extension):
-    await client.load_extension(f'cogs.{extension}')
-    await ctx.send("DONE")
-
-
-@client.command()
-@commands.is_owner()
-async def unloadcog(ctx, extension):
-    await client.unload_extension(f'cogs.{extension}')
-    await ctx.send("DONE")
-
 os.environ["JISHAKU_NO_UNDERSCORE"] = "t"
 os.environ["JISHAKU_FORCE_PAGINATOR"] = "t"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "t"
-
-
-@client.command()
-async def test(ctx, arg):
-    msg = await ctx.send(arg)
-
-    def check(msg):
-        return msg.author == ctx.author and msg.channel == ctx.channel
-    await msg.add_reaction("✅")
+os.environ["JISHAKU_HIDE"] = "t"
 
 asyncio.run(main())
