@@ -41,10 +41,9 @@ class Ready(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message) -> None:
-        if message.author == self.client.user:
-            if re.fullmatch(rf"<@!?{self.client.user.id}>", message.content):
-                await message.channel.send(f"My prefix is `&`")
-                return
+        if re.fullmatch(rf"<@!?{self.client.user.id}>", message.content):
+            await message.channel.send(f"My prefix is `&`")
+            return
 
 
 async def setup(client):
