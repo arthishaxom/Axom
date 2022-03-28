@@ -19,7 +19,6 @@ activity = discord.Activity(
     type=discord.ActivityType.watching, name="Leaderboards & Points")
 client = commands.Bot(command_prefix='&', activity=activity,
                       strip_after_prefix=True, owner_id=315342835283001344, intents=intents)
-client.remove_command("help")
 
 
 # async def create_pool():
