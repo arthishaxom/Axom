@@ -71,14 +71,14 @@ class MyView(View):
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
     async def button_callback(self, button, interaction):
-        await interaction.response.edit_message(view=self)
+        #await interaction.response.edit_message(view=self)
         self.value = "Yes"
         self.stop()
 
     @discord.ui.button(label="No", style=discord.ButtonStyle.red)
     async def no_button_callback(self, button, interaction):
-        self.clear_items()
-        await interaction.response.edit_message(view=self)
+        #self.clear_items()
+        #await interaction.response.edit_message(view=self)
         self.value = "No"
         self.stop()
 
