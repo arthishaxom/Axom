@@ -1,4 +1,5 @@
 from pipes import Template
+from turtle import title
 import discord
 from discord.ui import Button, View
 from discord.ext import commands
@@ -35,7 +36,11 @@ class Dropdown(discord.ui.Select):
         # opt = discord.utils.get(self.options, label=self.values[0])
         # self.options.remove(opt)
         self.view.value = self.values[0]
-        await interaction.message.delete()
+        embed_kills = discord.Embed(
+            title=f"<:icon_usage:947347839518920714> What Is `{self.view.value}` Kills?", color=BotColours.main())
+        # self.disabled = True
+        self.view.clear_items()
+        await interaction.response.edit_message(embed=embed_kills, view=self.view)
         self.view.stop()
 
 
@@ -47,15 +52,15 @@ class MySelectView(View):
         self.add_item(Dropdown(teamlist))
 
     @discord.ui.button(label="Save", style=discord.ButtonStyle.green)
-    async def button_callback(self, button, interaction):
-        # await interaction.response.edit_message(view=self)
+    async def button_callback(self, interaction, button):
+        await interaction.response.edit_message(view=self)
         self.value = "save"
         self.stop()
 
     @discord.ui.button(label="Skip", style=discord.ButtonStyle.grey)
-    async def no_button_callback(self, button, interaction):
-        # self.clear_items()
-        # await interaction.response.edit_message(view=self)
+    async def no_button_callback(self, interaction, button):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
         self.value = "skip"
         self.stop()
 
@@ -70,16 +75,52 @@ class MyView(View):
         self.value = None
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle.green)
-    async def button_callback(self, button, interaction):
-        #await interaction.response.edit_message(view=self)
+    async def button_callback(self, interaction, button):
+        await interaction.response.edit_message(view=self)
         self.value = "Yes"
         self.stop()
 
     @discord.ui.button(label="No", style=discord.ButtonStyle.red)
-    async def no_button_callback(self, button, interaction):
-        #self.clear_items()
-        #await interaction.response.edit_message(view=self)
+    async def no_button_callback(self, interaction, button):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
         self.value = "No"
+        self.stop()
+
+    async def on_timeout(self):
+        return
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if self.ctx.author.id != interaction.user.id:
+            return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
+        return True
+
+
+class PointsView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.value = None
+
+    @discord.ui.button(label="BGMI", style=discord.ButtonStyle.grey)
+    async def button1_callback(self, interaction: discord.Interaction, button):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
+        self.value = "bgmi"
+        self.stop()
+
+    @discord.ui.button(label="Free Fire", style=discord.ButtonStyle.grey)
+    async def button2_callback(self, interaction: discord.Interaction, button):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
+        self.value = "ff"
+        self.stop()
+
+    @discord.ui.button(label="Custom", style=discord.ButtonStyle.grey)
+    async def button3_callback(self, interaction: discord.Interaction, button):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
+        self.value = "custom"
         self.stop()
 
     async def on_timeout(self):
@@ -113,7 +154,7 @@ Quickly Calculate Points Of Unlimited Matches. Use calculate2 If You Are Having 
 
 > <a:red:938971541662761001> Info About Both The Formats Are Given Below.
 > <a:red:938971541662761001> Use `&slotlist` To Get The Empty Formats.
-        ''', color=discord.Colour.gold())
+        ''', color=BotColours.main())
         embed1.add_field(name="<:icon_supp:938970921702678548> TEAM PREFIXES FORMAT", value='''
 `Slot-No-1,Team-1-Prefix,Team-Name-1
 Slot-No-2,Team-2-Prefix,Team-Name-2`
@@ -141,7 +182,7 @@ __Example__ :
         embed_msg = await ctx.send(embed=embed1)
 
         ques_embed = discord.Embed(
-            title="Are You Ready With The Formats?", color=discord.Colour.gold())
+            title="Are You Ready With The Formats?", color=BotColours.main())
         view = MyView(ctx)
         ques_embed = await ctx.send(embed=ques_embed, view=view)
 
@@ -149,18 +190,18 @@ __Example__ :
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await ques_embed.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
             no_embed = discord.Embed(
-                title="OK, Try Again When You Are Ready", color=discord.Colour.gold())
+                title="OK, Try Again When You Are Ready", color=BotColours.main())
             await ques_embed.edit(embed=no_embed, view=view)
             return
 
         PointSysQues = discord.Embed(
-            title="Send Points System", description="`BGMI`/`Free Fire`", color=discord.Colour.gold())
+            title="Select Points System", color=BotColours.main())
         PointSysEmbed = await ctx.send(embed=PointSysQues)
         try:
             msg = await self.client.wait_for("message", timeout=120, check=check)
@@ -168,27 +209,27 @@ __Example__ :
         except asyncio.TimeoutError:
             await PointSysEmbed.delete()
             embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
             await ctx.send(embed=embed)
             return
         await PointSysEmbed.delete()
         await msg.delete()
         if PointSystem.lower() not in ["bgmi", "free fire", "ff"]:
             embed = discord.Embed(
-                title=f'Input A Valid Game', color=discord.Colour.red())
+                title=f'Input A Valid Game', color=BotColours.error())
             await ctx.send(embed=embed)
             return
 
         await ques_embed.delete()
         if view.value == "Yes":
             embed2 = discord.Embed(
-                title="SEND FORMATS", description="Send The First Format With Team Names & Prefixes.", color=discord.Colour.gold())
+                title="SEND FORMATS", description="Send The First Format With Team Names & Prefixes.", color=BotColours.main())
             await embed_msg.edit(embed=embed2)
             try:
                 msg = await self.client.wait_for("message", timeout=120, check=check)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
                 return
             try:
@@ -202,7 +243,7 @@ __Example__ :
                 await asyncio.sleep(1)
             except Exception as e:
                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : {e}', color=discord.Colour.red())
+                                      description=f'The Error : {e}', color=BotColours.error())
                 await ctx.send(embed=embed)
                 await msg.add_reaction("❌")
                 return
@@ -211,13 +252,13 @@ __Example__ :
 
             await msg.delete()
             embed3 = discord.Embed(
-                title="NUMBER OF MATCHES", description="Send The Number Of Matches.", color=discord.Colour.gold())
+                title="NUMBER OF MATCHES", description="Send The Number Of Matches.", color=BotColours.main())
             await embed_msg.edit(embed=embed3)
             try:
                 nmatches_raw = await self.client.wait_for("message", timeout=120, check=check)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
                 return
             try:
@@ -236,13 +277,13 @@ __Example__ :
             await nmatches_raw.delete()
             for i in range(nmatches):
                 embed4 = discord.Embed(
-                    title="ENTER MATCH POINTS", description=f"Send The Points Of The Match {i+1} As Per Format.", color=discord.Colour.gold())
+                    title="ENTER MATCH POINTS", description=f"Send The Points Of The Match {i+1} As Per Format.", color=BotColours.main())
                 await embed_msg.edit(embed=embed4)
                 try:
                     msg = await self.client.wait_for("message", timeout=120, check=check)
                 except asyncio.TimeoutError:
                     embed = discord.Embed(
-                        title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+                        title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                     await ctx.send(embed=embed)
                     return
 
@@ -299,7 +340,7 @@ __Example__ :
                 except Exception as e:
                     await msg.add_reaction("❌")
                     embed = discord.Embed(
-                        title=f'SOME ERROR OCCURED !!!', description=f'The Error : \n{e}', color=discord.Colour.red())
+                        title=f'SOME ERROR OCCURED !!!', description=f'The Error : \n{e}', color=BotColours.error())
                     await ctx.send(embed=embed)
                     for i in range(nmatches):
                         os.remove(f"{server_name}match{i+1}.csv")
@@ -309,7 +350,7 @@ __Example__ :
 **` 1 ` TOP 25
 ` 2 ` TOP 20
 ` 3 ` ALL TEAMS**
-''', color=discord.Colour.gold())
+''', color=BotColours.main())
 
             await embed_msg.edit(embed=embed5)
             try:
@@ -319,7 +360,7 @@ __Example__ :
             except Exception as e:
                 await msg.add_reaction("❌")
                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : \n{e}', color=discord.Colour.red())
+                                      description=f'The Error : \n{e}', color=BotColours.error())
                 await ctx.send(embed=embed)
                 for i in range(nmatches):
                     os.remove(f"{server_name}match{i+1}.csv")
@@ -388,7 +429,7 @@ __Example__ :
                         by=["total_pts", "total_position", "total_wwcd", "total_kills"], ascending=False, inplace=True)
             except Exception as e:
                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : \n{e}', color=discord.Colour.red())
+                                      description=f'The Error : \n{e}', color=BotColours.error())
                 await ctx.send(embed=embed)
                 for i in range(nmatches):
                     os.remove(f"{server_name}match{i+1}.csv")
@@ -443,13 +484,13 @@ __Example__ :
                     valtotalsl = ",".join(valtotalsc)
             except Exception as e:
                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : \n{e}', color=discord.Colour.red())
+                                      description=f'The Error : \n{e}', color=BotColours.error())
                 await ctx.send(embed=embed)
                 for i in range(nmatches):
                     os.remove(f"{server_name}match{i+1}.csv")
                 return
             embed6 = discord.Embed(
-                description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=discord.Colour.gold())
+                description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=BotColours.main())
             embed6.set_footer(text="HOLD TO COPY | USE &lb TO LEADERBOARD")
             await embed_msg.edit(embed=embed6)
             for i in range(nmatches):
@@ -457,7 +498,6 @@ __Example__ :
 
 
 # TODO Calculate Points Command #2 = c2
-
 
     @commands.command(name='calculate2', aliases=["c2", "calc2"], case_insensitive=True, help='''
 Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People Who Don't Understand Calculate1 Method
@@ -487,7 +527,7 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
         await NoOfMatchesRaw.delete()
 
         embed4 = discord.Embed(
-            title="<:icon_usage:947347839518920714> Match Input Process", description=f"**Total Matches - `{NoOfMatches}`**", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> Match Input Process", description=f"**Total Matches - `{NoOfMatches}`**", color=BotColours.main())
         await MatchQuesEmbed.edit(embed=embed4)
 
         server_nname = ctx.message.guild.name
@@ -496,43 +536,76 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
             if i.isalnum():
                 server_name += i
         PointSysQues = discord.Embed(
-            title="Send Points System", description="`BGMI`/`Free Fire`", color=discord.Colour.gold())
-        PointSysEmbed = await ctx.send(embed=PointSysQues)
-        try:
-            msg = await self.client.wait_for("message", timeout=120, check=check)
-            PointSystem = msg.content
-        except asyncio.TimeoutError:
-            await PointSysEmbed.delete()
-            embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
-            await ctx.send(embed=embed)
+            title="Select Points System", color=BotColours.main())
+        view = PointsView(ctx)
+        PointSysEmbed = await ctx.send(embed=PointSysQues, view=view)
+        res = await view.wait()
+        if res:
+            view.clear_items()
+            error_embed = discord.Embed(
+                title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+            await PointSysEmbed.edit(embed=error_embed, view=view)
             return
-        await PointSysEmbed.delete()
-        await msg.delete()
-        if PointSystem.lower() not in ["bgmi", "free fire", "ff"]:
-            embed = discord.Embed(
-                title=f'Input A Valid Game', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
+        # await PointSysEmbed.delete()
+        if view.value == "bgmi":
+            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+            mapos = {1: 15, 2: 12, 3: 10, 4: 8, 5: 6, 6: 4, 7: 2, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1,
+                     13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+        elif view.value == "ff":
+            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+            mapos = {1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1, 11: 0, 12: 0,
+                     13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+        else:
+            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+            mapos = {}
+            customPointsSys = discord.Embed(title="<:icon_usage:947347839518920714> Custom Points System", description='''
+Send The Points System In The Format
+```
+1 - 5
+2 - 4
+3 - 3
+4 - 2
+5 - 1```
+''', color=BotColours.main())
+            customPointsSysEmbed = await ctx.send(embed=customPointsSys)
+            RawMessage = await self.client.wait_for("message", timeout=100, check=check)
+            MessageContent = RawMessage.content
+            MessageSplit = MessageContent.splitlines()
+            LastPosition = 0
+            for i in range(len(MessageSplit)):
+                MessageSplited = MessageSplit[i].split("-")
+                mapos[int(MessageSplited[0].strip())] = int(
+                    MessageSplited[1].strip())
+                LastPosition = int(MessageSplited[0].strip())
+
+            for k in range(25 - len(MessageSplit)):
+                mapos[LastPosition+k+1] = 0
+            await customPointsSysEmbed.delete()
+            print(mapos)
+
+            await RawMessage.delete()
         AskSlotlistEmbed = discord.Embed(
             title="<:icon_usage:947347839518920714> Send The Slotlist.", color=BotColours.main())
-        AskSlotlist = await ctx.send(embed=AskSlotlistEmbed)
+        await PointSysEmbed.edit(embed=AskSlotlistEmbed)
         try:
             SlotlistObject = await self.client.wait_for("message", timeout=15, check=check)
             SlotlistRaw = SlotlistObject.content
         except asyncio.TimeoutError:
             embed = discord.Embed(
                 title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-            await AskSlotlist.edit(embed=embed)
+            await PointSysEmbed.edit(embed=embed)
             return
-        await AskSlotlist.delete()
+        # await AskSlotlist.delete()
         await SlotlistObject.delete()
         SlotlistLineSplit = SlotlistRaw.splitlines()
+        SlotlistOnly = []
         if '@' in SlotlistLineSplit[0]:
-            SlotlistOnly = []
             for Val in SlotlistLineSplit:
-                if "@" in Val:
-                    ele = i.split("@")
+                if "<@" in Val:
+                    ele = Val.split("<@")
                     SlotlistOnly.append(ele[0])
         else:
             SlotlistOnly = SlotlistLineSplit
@@ -544,20 +617,9 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                     ele = ((team.split(i))[1].strip())
                     SlotlistFinal.append(ele)
 
-        if PointSystem.lower() == "bgmi":
-            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
-                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-            mapos = {1: 15, 2: 12, 3: 10, 4: 8, 5: 6, 6: 4, 7: 2, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1,
-                     13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-        else:
-            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
-                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-            mapos = {1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1, 11: 0, 12: 0,
-                     13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-
         for MatchNumber in range(1, NoOfMatches + 1):
             embed4 = discord.Embed(
-                title="<:icon_usage:947347839518920714> Matches Input Process", description=f"**Total Match - `{NoOfMatches}`\nOngoing - `{MatchNumber}`**", color=BotColours.main())
+                title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f"**Total Matches - `{NoOfMatches}`\nOngoing Match- `{MatchNumber}`**", color=BotColours.main())
 
             column_names = [f'teamname',
                             f'position{MatchNumber}', f'kills{MatchNumber}', f"cd{MatchNumber}"]
@@ -572,19 +634,20 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                 embed1 = discord.Embed(
                     title=f"<:icon_usage:947347839518920714> Choose The #{TeamRank} Team", color=BotColours.main())
                 view = MySelectView(ctx, TeamList)
-                MainEmbed = await ctx.send(embed=embed1, view=view)
+                # MainEmbed = await ctx.send(embed=embed1, view=view)
+                await PointSysEmbed.edit(embed=embed1, view=view)
                 res = await view.wait()
                 if res:
                     view.clear_items()
                     error_embed = discord.Embed(
                         title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-                    await MainEmbed.edit(embed=error_embed, view=view)
+                    await PointSysEmbed.edit(embed=error_embed, view=view)
                     return
                 if view.value in TeamList:
                     try:
-                        embed2 = discord.Embed(
-                            title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
-                        embed_obj = await ctx.send(embed=embed2)
+                        # embed2 = discord.Embed(
+                        #     title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
+                        # embed_obj = await ctx.send(embed=embed2)
                         TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
                         TeamKills = int(TeamKillsQues.content)
 
@@ -599,7 +662,8 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                         TeamList.remove(view.value)
                         TeamRank += 1
                         await TeamKillsQues.delete()
-                        await embed_obj.delete()
+                        # await MainEmbed.delete()
+                        # await embed_obj.delete()
                     except asyncio.TimeoutError:
                         await TeamKillsQues.delete()
                         timeup_embed = discord.Embed(
@@ -608,10 +672,10 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                         return
                 else:
                     if view.value == "skip":
-                        await MainEmbed.delete()
+                        # await MainEmbed.delete()
                         TeamRank += 1
                     else:
-                        await MainEmbed.delete()
+                        # await MainEmbed.delete()
                         for i in TeamList:
                             df.loc[TeamRank] = [i, 0,
                                                 0, 0]
@@ -626,9 +690,10 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                     TeamRank += 1
 
             df.to_csv(f"{server_name}match{MatchNumber}.csv", index=False)
-            embed4 = discord.Embed(
-                title="<:icon_usage:947347839518920714> Matches Input Process", description=f"**Total Match - `{NoOfMatches}`\nOngoing - `{MatchNumber}`\n__Completed__**", color=BotColours.main())
-            await MatchQuesEmbed.edit(embed=embed4)
+        await PointSysEmbed.delete()
+        embed4 = discord.Embed(
+            title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f"**Total Match - `{NoOfMatches}`\nOngoing Match - `{MatchNumber}`\n__Completed__**", color=BotColours.main())
+        await MatchQuesEmbed.edit(embed=embed4)
 
         col_total = []
         col_position = []
@@ -691,7 +756,7 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                     by=["total_pts", "total_position", "total_wwcd", "total_kills"], ascending=False, inplace=True)
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             for i in range(NoOfMatches):
                 os.remove(f"{server_name}match{i+1}.csv")
@@ -732,13 +797,13 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                 valtotalsl = ",".join(valtotalsc)
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             for i in range(NoOfMatches):
                 os.remove(f"{server_name}match{i+1}.csv")
             return
         embed6 = discord.Embed(
-            description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=discord.Colour.gold())
+            description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=BotColours.main())
         embed6.set_footer(text="HOLD TO COPY | USE &lb TO LEADERBOARD")
         await ctx.send(embed=embed6)
         for i in range(NoOfMatches):
@@ -758,14 +823,14 @@ Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People 
                 msg = await self.client.wait_for("message", timeout=120, check=check)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
                 return
         try:
             listslot = slotlist.splitlines()
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             return
         slotlist = msg.content
@@ -776,7 +841,7 @@ Here, ) Is The Delimeter`**''')
             input2 = await self.client.wait_for("message", timeout=120, check=check)
         except asyncio.TimeoutError:
             embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
+                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
             await ctx.send(embed=embed)
             return
         delimeter = input2.content
@@ -792,7 +857,7 @@ Here, ) Is The Delimeter`**''')
             await ctx.send("\n".join(nlist[:len(listslot)]))
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             return
 
