@@ -17,6 +17,9 @@ class AxomHelp(commands.MinimalHelpCommand):
                               color=BotColours.main())
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
         for cog, commands in mapping.items():
+            cog_name = getattr(cog, "qualified_name", "No Category")
+            if cog_name == "AxomHelpCog":
+                continue
             filtered = await self.filter_commands(commands, sort=False)
             command_signatures = [
                 self.get_command_signature(c) for c in filtered]

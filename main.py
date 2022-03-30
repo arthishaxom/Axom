@@ -5,6 +5,7 @@ import json
 import asyncpg
 import jishaku
 import asyncio
+import logging
 
 with open("config.json", 'r') as configjsonFile:
     configData = json.load(configjsonFile)
@@ -20,7 +21,13 @@ activity = discord.Activity(
 client = commands.Bot(command_prefix='&', activity=activity,
                       strip_after_prefix=True, owner_id=315342835283001344, intents=intents)
 
-
+logger = logging.getLogger('discord')
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(
+    filename='discord.log', encoding='utf-8', mode='w')
+handler.setFormatter(logging.Formatter(
+    '%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
+logger.addHandler(handler)
 # async def create_pool():
 #     # client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', db='railway')
 #     client.db = await asyncpg.connect(host='containers-us-west-29.railway.app', port=7183,user='postgres', password='C81BI8wU7QHzR5mXTvMZ', database='railway')
