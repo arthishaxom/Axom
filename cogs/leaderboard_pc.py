@@ -3,7 +3,6 @@ import os
 import asyncio
 from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
-from discord.ext.commands.core import bot_has_permissions
 from discord.utils import get
 from Utilities.helpful_lb import top20, top25
 
@@ -66,7 +65,7 @@ TOTAL1,TOTAL2,...
             embed1.set_footer(text='Besure To Have Atleast 2 Teams')
             embed_msg = await ctx.send(embed=embed1)
             try:
-                msg = await self.client.wait_for("message", timeout=120, check=check)
+                msg = await self.client.wait_for("message", timeout=30, check=check)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
@@ -109,7 +108,7 @@ TOTAL1,TOTAL2,...
             await msg.delete()
             await embed_msg.edit(embed=embed2)
             try:
-                msg = await self.client.wait_for("message", timeout=120, check=check)
+                msg = await self.client.wait_for("message", timeout=60, check=check)
             except asyncio.TimeoutError:
                 embed = discord.Embed(
                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
@@ -159,7 +158,7 @@ TOTAL1,TOTAL2,...
                 server_name += i
         try:
             await msg.delete()
-            msg = await self.client.wait_for("message", timeout=120, check=check)
+            msg = await self.client.wait_for("message", timeout=15, check=check)
         except asyncio.TimeoutError:
             embed = discord.Embed(
                 title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())

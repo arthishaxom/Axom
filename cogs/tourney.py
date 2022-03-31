@@ -2,6 +2,7 @@ import discord
 import asyncio
 from discord.ext import commands
 from Utilities.buttons_view import MyView
+from Utilities.BotColoursInfo import BotColours
 
 
 class TourneyHelpers(commands.Cog):
@@ -17,30 +18,30 @@ class TourneyHelpers(commands.Cog):
             return msg.author == ctx.author and msg.channel == ctx.channel
         view = MyView(ctx)
         embed1 = discord.Embed(
-            title="<:warning:946654059715244033> CAUTION", description=f"**Before Using This Command, Besure {self.client.user.mention} Is Whitelisted From Any Antinuke Bots, Or Else Boom...Bot Gone\nAre You Ready ?**", color=discord.Colour.gold())
+            title="<:warning:946654059715244033> CAUTION", description=f"**Before Using This Command, Besure {self.client.user.mention} Is Whitelisted From Any Antinuke Bots, Or Else Boom...Bot Gone\nAre You Ready ?**", color=BotColours.main())
         embed_ques = await ctx.send(embed=embed1, view=view)
 
         res = await view.wait()
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await embed_ques.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
             no_embed = discord.Embed(
-                title="I Won't Be Able To Proceed Without It.", color=discord.Colour.red())
+                title="I Won't Be Able To Proceed Without It.", color=BotColours.error())
             await embed_ques.edit(embed=no_embed, view=view)
             return
         if view.value == "Yes":
             view.clear_items()
             # yes_embed = discord.Embed(
-            #     title="Please Wait <a:icon_loading:939409269978177546>", color=discord.Colour.gold())
+            #     title="Please Wait <a:icon_loading:939409269978177546>", color=BotColours.main())
             await embed_ques.edit(view=view)
 
         embed2 = discord.Embed(
-            title="<:icon_usage:947347839518920714> What Is Tournament Name?", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> What Is Tournament Name?", color=BotColours.main())
         await embed_ques.edit(embed=embed2)
 
         try:
@@ -49,13 +50,13 @@ class TourneyHelpers(commands.Cog):
         except asyncio.TimeoutError:
             await tname.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await embed_ques.edit(embed=timeup_embed)
             return
         await tname.delete()
 
         yes_embed = discord.Embed(
-            title="Please Wait <a:icon_loading:939409269978177546>", color=discord.Colour.gold())
+            title="Please Wait <a:icon_loading:939409269978177546>", color=BotColours.main())
         await embed_ques.edit(embed=yes_embed)
 
         guild = ctx.guild
@@ -68,7 +69,7 @@ class TourneyHelpers(commands.Cog):
         tcategory = category
 
         ques_embed = discord.Embed(title=f"<:stary:946641691752935454> Half-Way There <a:icon_loading:939409269978177546>",
-                                   description=f"Go To The Category Settings Of the Category Just Created ` [Will Be At Last] ` & Turn On <:turn_on:946698850901577789> The `Manage Permissions` For {self.client.user.mention}.\n> Press **Yes** Button After You Have Done It.", color=discord.Colour.gold())
+                                   description=f"Go To The Category Settings Of the Category Just Created ` [Will Be At Last] ` & Turn On <:turn_on:946698850901577789> The `Manage Permissions` For {self.client.user.mention}.\n> Press **Yes** Button After You Have Done It.", color=BotColours.main())
         view = MyView(ctx)
         ques_embed = await embed_ques.edit(embed=ques_embed, view=view)
 
@@ -86,13 +87,13 @@ class TourneyHelpers(commands.Cog):
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await tcategory.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
             no_embed = discord.Embed(
-                title="I Won't Be Able To Proceed Without It.", color=discord.Colour.red())
+                title="I Won't Be Able To Proceed Without It.", color=BotColours.error())
             await ques_embed.edit(embed=no_embed, view=view)
             await tcategory.delete()
             return
@@ -121,11 +122,11 @@ class TourneyHelpers(commands.Cog):
             await queriesc.set_permissions(ctx.guild.default_role, overwrite=perms)
 
             comp_embed = discord.Embed(
-                title="Completed <:tick:946641197642956830>", color=discord.Colour.gold())
+                title="Completed <:tick:946641197642956830>", color=BotColours.main())
             await embed_ques.edit(embed=comp_embed)
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             raise e
             return
@@ -138,7 +139,7 @@ class TourneyHelpers(commands.Cog):
             return msg.author == ctx.author and msg.channel == ctx.channel
 
         ques_embed = discord.Embed(title="<:delete:946641398269083709> You Sure Want To Delete These?",
-                                   description="This Category & Every Channel Under This Category Will Be Deleted.", color=discord.Colour.gold())
+                                   description="This Category & Every Channel Under This Category Will Be Deleted.", color=BotColours.main())
         view = MyView(ctx)
         ques_embed = await ctx.send(embed=ques_embed, view=view)
 
@@ -146,18 +147,18 @@ class TourneyHelpers(commands.Cog):
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await ques_embed.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
-            no_embed = discord.Embed(title="OK", color=discord.Colour.gold())
+            no_embed = discord.Embed(title="OK", color=BotColours.main())
             await ques_embed.edit(embed=no_embed, view=view)
             return
         if view.value == "Yes":
             view.clear_items()
             yes_embed = discord.Embed(
-                title="Please Wait <a:icon_loading:939409269978177546>", color=discord.Colour.gold())
+                title="Please Wait <a:icon_loading:939409269978177546>", color=BotColours.main())
             await ques_embed.edit(embed=yes_embed, view=view)
 
         delcategory = category
@@ -170,11 +171,11 @@ class TourneyHelpers(commands.Cog):
                     pass
             await delcategory.delete()
             comp_embed = discord.Embed(
-                title="Completed <:tick:946641197642956830>", color=discord.Colour.gold())
+                title="Completed <:tick:946641197642956830>", color=BotColours.main())
             await ques_embed.edit(embed=comp_embed)
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             return
 
@@ -186,7 +187,7 @@ class TourneyHelpers(commands.Cog):
             return msg.author == ctx.author and msg.channel == ctx.channel
 
         ques_embed = discord.Embed(title="<:delete:946641398269083709> You Sure Want To Unhide These?",
-                                   description="This Category & Every Channel Under This Category Will Be Visible To Everyone.", color=discord.Colour.gold())
+                                   description="This Category & Every Channel Under This Category Will Be Visible To Everyone.", color=BotColours.main())
         view = MyView(ctx)
         ques_embed = await ctx.send(embed=ques_embed, view=view)
 
@@ -194,18 +195,18 @@ class TourneyHelpers(commands.Cog):
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await ques_embed.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
-            no_embed = discord.Embed(title="OK", color=discord.Colour.gold())
+            no_embed = discord.Embed(title="OK", color=BotColours.main())
             await ques_embed.edit(embed=no_embed, view=view)
             return
         if view.value == "Yes":
             view.clear_items()
             yes_embed = discord.Embed(
-                title="Please Wait <a:icon_loading:939409269978177546>", color=discord.Colour.gold())
+                title="Please Wait <a:icon_loading:939409269978177546>", color=BotColours.main())
             await ques_embed.edit(embed=yes_embed, view=view)
 
         delcategory = category
@@ -219,11 +220,11 @@ class TourneyHelpers(commands.Cog):
                 except AttributeError:
                     pass
             comp_embed = discord.Embed(
-                title="Completed <:tick:946641197642956830>", color=discord.Colour.gold())
+                title="Completed <:tick:946641197642956830>", color=BotColours.main())
             await ques_embed.edit(embed=comp_embed)
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             return
 
@@ -235,7 +236,7 @@ class TourneyHelpers(commands.Cog):
             return msg.author == ctx.author and msg.channel == ctx.channel
 
         load_embed = discord.Embed(
-            title="Please Wait <a:icon_loading:939409269978177546>", color=discord.Colour.gold())
+            title="Please Wait <a:icon_loading:939409269978177546>", color=BotColours.main())
         sent_embed = await ctx.send(embed=load_embed)
 
         delcategory = category
@@ -249,11 +250,11 @@ class TourneyHelpers(commands.Cog):
                 except AttributeError:
                     pass
             comp_embed = discord.Embed(
-                title="Completed <:tick:946641197642956830>", color=discord.Colour.gold())
+                title="Completed <:tick:946641197642956830>", color=BotColours.main())
             await sent_embed.edit(embed=comp_embed)
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             await sent_embed.edit(embed=embed)
             return
 
@@ -269,7 +270,7 @@ class TourneyHelpers(commands.Cog):
         # // channels = delcategory.channels
         # todo ASKING TOURNEY NAME
         ques_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> What Is Tournament's Name ?", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> What Is Tournament's Name ?", color=BotColours.main())
         ques_embed1 = await ctx.send(embed=ques_embed)
 
         try:
@@ -277,7 +278,7 @@ class TourneyHelpers(commands.Cog):
         except asyncio.TimeoutError:
             await msg.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
             return
 
@@ -286,7 +287,7 @@ class TourneyHelpers(commands.Cog):
 
         # todo ASKING TOUNEY PP
         ques2_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> What Is Tournament's PrizePool ?", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> What Is Tournament's PrizePool ?", color=BotColours.main())
         await ques_embed1.edit(embed=ques2_embed)
 
         try:
@@ -294,7 +295,7 @@ class TourneyHelpers(commands.Cog):
         except asyncio.TimeoutError:
             await msg.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
             return
 
@@ -307,7 +308,7 @@ class TourneyHelpers(commands.Cog):
 >>> **Write The Distribution Separated By Commas ","
 If Some Prize Is Alloted to MVP, Write `mvp` With It.
 Example - ` 2000,1000,500,500mvp `**
-''', color=discord.Colour.gold())
+''', color=BotColours.main())
         await ques_embed1.edit(embed=ques2_embed)
 
         try:
@@ -315,7 +316,7 @@ Example - ` 2000,1000,500,500mvp `**
         except asyncio.TimeoutError:
             await msg.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
             return
 
@@ -340,7 +341,7 @@ Example - ` 2000,1000,500,500mvp `**
 
         # todo ASKING TOURNEY SLOTS
         ques3_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> What Are The Number Of Slots In The Tournament ?", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> What Are The Number Of Slots In The Tournament ?", color=BotColours.main())
         await ques_embed1.edit(embed=ques3_embed)
 
         try:
@@ -348,7 +349,7 @@ Example - ` 2000,1000,500,500mvp `**
         except asyncio.TimeoutError:
             await msg.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
             return
 
@@ -359,7 +360,7 @@ Example - ` 2000,1000,500,500mvp `**
         view = MyView(ctx)
 
         ques3_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> Does This Tournament Have Different Sponsers ?", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> Does This Tournament Have Different Sponsers ?", color=BotColours.main())
         await ques_embed1.edit(embed=ques3_embed, view=view)
         # ques_embed = await ctx.send(embed=ques_embed, view=view)
 
@@ -367,18 +368,18 @@ Example - ` 2000,1000,500,500mvp `**
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await ques_embed1.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
-            no_embed = discord.Embed(title="OK", color=discord.Colour.gold())
+            no_embed = discord.Embed(title="OK", color=BotColours.main())
             await ques_embed1.edit(embed=no_embed, view=view)
             spon_name = ctx.guild.name
         if view.value == "Yes":
             view.clear_items()
             yes_embed = discord.Embed(
-                title="Ok, Tell What's Their Name?", color=discord.Colour.gold())
+                title="Ok, Tell What's Their Name?", color=BotColours.main())
             await ques_embed1.edit(embed=yes_embed, view=view)
 
             try:
@@ -387,7 +388,7 @@ Example - ` 2000,1000,500,500mvp `**
             except asyncio.TimeoutError:
                 await msg.delete()
                 timeup_embed = discord.Embed(
-                    title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                    title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
                 await ques_embed1.edit(embed=timeup_embed)
                 return
             await msg.delete()
@@ -396,7 +397,7 @@ Example - ` 2000,1000,500,500mvp `**
         view = MyView(ctx)
 
         ques4_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> Do You Have Any Banner ?", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> Do You Have Any Banner ?", color=BotColours.main())
         await ques_embed1.edit(embed=ques4_embed, view=view)
         # ques_embed = await ctx.send(embed=ques_embed, view=view)
 
@@ -404,18 +405,18 @@ Example - ` 2000,1000,500,500mvp `**
         if res:
             view.clear_items()
             error_embed = discord.Embed(
-                title=f'Timeout !!!', color=discord.Colour.red())
+                title=f'Timeout !!!', color=BotColours.error())
             await ques_embed1.edit(embed=error_embed, view=view)
             return
         if view.value == "No":
             view.clear_items()
-            no_embed = discord.Embed(title="OK", color=discord.Colour.gold())
+            no_embed = discord.Embed(title="OK", color=BotColours.main())
             await ques_embed1.edit(embed=no_embed, view=view)
             tbanner = ''
         if view.value == "Yes":
             view.clear_items()
             yes_embed = discord.Embed(
-                title="Ok, Send It", color=discord.Colour.gold())
+                title="Ok, Send It", color=BotColours.main())
             await ques_embed1.edit(embed=yes_embed, view=view)
 
             try:
@@ -427,7 +428,7 @@ Example - ` 2000,1000,500,500mvp `**
             except asyncio.TimeoutError:
                 await msg.delete()
                 timeup_embed = discord.Embed(
-                    title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                    title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
                 await ques_embed1.edit(embed=timeup_embed)
                 return
             await msg.delete()
@@ -435,7 +436,7 @@ Example - ` 2000,1000,500,500mvp `**
         # todo ASKING TOURNEY EXTRA INFO
 
         ques4_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> Send Some Extra Info For Your Tournament.", description="**Send Only One-Line Info Like This,\n> MODE : TPP | SQUAD**", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> Send Some Extra Info For Your Tournament.", description="**Send Only One-Line Info Like This,\n> MODE : TPP | SQUAD**", color=BotColours.main())
         await ques_embed1.edit(embed=ques4_embed)
         # ques_embed = await ctx.send(embed=ques_embed, view=view)
         try:
@@ -444,14 +445,14 @@ Example - ` 2000,1000,500,500mvp `**
         except asyncio.TimeoutError:
             await msg.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
             return
         await msg.delete()
 
         # todo ASKING CHANNEL MENTION
         ques4_embed = discord.Embed(
-            title="<:icon_usage:947347839518920714> Where Should I Send This ?", description=f"Mention The Channel, Like This {ctx.channel.mention}", color=discord.Colour.gold())
+            title="<:icon_usage:947347839518920714> Where Should I Send This ?", description=f"Mention The Channel, Like This {ctx.channel.mention}", color=BotColours.main())
         await ques_embed1.edit(embed=ques4_embed)
 
         try:
@@ -459,7 +460,7 @@ Example - ` 2000,1000,500,500mvp `**
         except asyncio.TimeoutError:
             await msg.delete()
             timeup_embed = discord.Embed(
-                title="Times Up <:icon_clock:947357599030997043>", color=discord.Colour.red())
+                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
             return
 
@@ -468,7 +469,7 @@ Example - ` 2000,1000,500,500mvp `**
             info_channel = self.client.get_channel(msg.channel_mentions[0].id)
         except:
             error_embed = discord.Embed(
-                title="Couldn't Find The Channel <:warning:946654059715244033>", color=discord.Colour.gold())
+                title="Couldn't Find The Channel <:warning:946654059715244033>", color=BotColours.main())
             await ques_embed1.edit(embed=error_embed)
         # // guildiff = self.client.get_guild(856034795863932978)
         await msg.delete()
@@ -496,7 +497,7 @@ Example - ` 2000,1000,500,500mvp `**
 <:line_middle:947143807525326868> PrizePool - {tprizepool}
 <:line_middle:947143807525326868> Total Slots - {tslots}
 <:line_bottom:947143905810473050> {extra_line}**
-''', color=discord.Colour.gold())
+''', color=BotColours.main())
             # tinfo_embed.set_thumbnail(url=ticon)
             tinfo_embed.set_image(url=tbanner)
 
@@ -505,7 +506,7 @@ Example - ` 2000,1000,500,500mvp `**
             await tinfo_webhook.send(username=f"{guild_name}", avatar_url=f"{guild_avatar}", embed=tinfo_embed)
 
             success_embed = discord.Embed(
-                title="Sent The Info <:tick:946641197642956830>", color=discord.Colour.gold())
+                title="Sent The Info <:tick:946641197642956830>", color=BotColours.main())
             await ques_embed1.edit(embed=success_embed)
             await tinfo_webhook.delete()
         except:
@@ -519,7 +520,7 @@ Example - ` 2000,1000,500,500mvp `**
 <:line_middle:947143807525326868> PrizePool - {tprizepool}
 <:line_middle:947143807525326868> Total Slots - {tslots}
 <:line_bottom:947143905810473050> {extra_line}**
-''', color=discord.Colour.gold())
+''', color=BotColours.main())
             # tinfo_embed.set_thumbnail(url=ticon)
             tinfo_embed.set_image(url=tbanner)
 
@@ -528,7 +529,7 @@ Example - ` 2000,1000,500,500mvp `**
             await tinfo_webhook.send(username=f"{guild_name}", avatar_url=f"{guild_avatar}", embed=tinfo_embed)
 
             success_embed = discord.Embed(
-                title="Sent The Info <:tick:946641197642956830>", color=discord.Colour.gold())
+                title="Sent The Info <:tick:946641197642956830>", color=BotColours.main())
             await ques_embed1.edit(embed=success_embed)
             await info_channel.send(embed=tinfo_embed)
 
