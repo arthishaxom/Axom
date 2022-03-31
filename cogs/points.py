@@ -582,7 +582,6 @@ Send The Points System In The Format
             for k in range(25 - len(MessageSplit)):
                 mapos[LastPosition+k+1] = 0
             await customPointsSysEmbed.delete()
-            print(mapos)
 
             await RawMessage.delete()
         AskSlotlistEmbed = discord.Embed(
