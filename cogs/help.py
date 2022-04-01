@@ -47,8 +47,8 @@ class AxomHelp(commands.MinimalHelpCommand):
         key_order = ["Leaderboard", "Points", "TourneyHelpers", "Misc"]
         emoji_order = {"Leaderboard": "<:leaderb:947178467156430868>", "Points": "<:icon_usage:947347839518920714>",
                        "TourneyHelpers": "<:awardicon:954265063907283005>", "Misc": "<:box:947178898553204736>"}
-        cog_commands_dict = dict(
-            sorted(cog_commands_dict.items(), key=lambda x: key_order.index(x[0])))
+        cog_commands_dict = {k: cog_commands_dict[k]
+                             for k in key_order if k in cog_commands_dict}
         for cog_name, commands in cog_commands_dict.items():
             embed.add_field(
                 name=f"{emoji_order[cog_name]} {cog_name}", value=f"**`{commands}`**")
