@@ -2,6 +2,14 @@ from click import command
 import discord
 from discord.ext import commands
 from Utilities.BotColoursInfo import BotColours
+from Utilities.Links import InviteLink, VoteLink
+
+
+class LinkView(discord.ui.View):
+    def __init__(self):
+        super().__init__()
+        self.add_item(discord.ui.Button(label='Invite Me', url=InviteLink()))
+        self.add_item(discord.ui.Button(label='Vote Me', url=VoteLink()))
 
 
 class AxomHelp(commands.MinimalHelpCommand):
@@ -13,9 +21,11 @@ class AxomHelp(commands.MinimalHelpCommand):
         return '%s%s %s' % (self.context.clean_prefix, command.qualified_name, command.signature)
 
     async def send_bot_help(self, mapping):
+        view = LinkView()
         embed = discord.Embed(title="Axom Help Section",
                               color=BotColours.main())
         embed.set_footer(text="Made With ❤️ | By AE・ARTHISHᵍᶠˣ#2716")
+        cog_commands_dict = {}
         for cog, commands in mapping.items():
             cog_name = getattr(cog, "qualified_name", "No Category")
             if cog_name == "AxomHelpCog":
@@ -23,26 +33,40 @@ class AxomHelp(commands.MinimalHelpCommand):
             filtered = await self.filter_commands(commands, sort=False)
             command_signatures = [
                 self.get_command_signature(c) for c in filtered]
+            command
+            if "serverlist" in command_signatures:
+                command_signatures.remove("serverlist")
+            if "leave" in command_signatures:
+                command_signatures.remove("leave")
             if command_signatures:
                 cog_name = getattr(cog, "qualified_name", "No Category")
                 CommandsNames = "`, `".join(
                     command_signatures)
-                embed.add_field(
-                    name=f"<:awardicon:954265063907283005> {cog_name}", value=f"\n`{CommandsNames}`\n", inline=False)
+                cog_commands_dict[cog_name] = CommandsNames
+
+        key_order = ["Leaderboard", "Points", "TourneyHelpers", "Misc"]
+        emoji_order = {"Leaderboard": "<:leaderb:947178467156430868>", "Points": "<:icon_usage:947347839518920714>",
+                       "TourneyHelpers": "<:awardicon:954265063907283005>", "Misc": "<:box:947178898553204736>"}
+        cog_commands_dict = dict(
+            sorted(cog_commands_dict.items(), key=lambda x: key_order.index(x[0])))
+        for cog_name, commands in cog_commands_dict.items():
+            embed.add_field(
+                name=f"{emoji_order[cog_name]} {cog_name}", value=f"**`{commands}`**")
+
         embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value='''
 **<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
-<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=880314360017338380&permissions=805432529&scope=bot)
+<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=908949899645706241&permissions=2952916049&scope=bot%20applications.commands)
 <:like:947180731656994866> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
 **
 ''')
 
         channel = self.get_destination()
-        await channel.send(embed=embed)
+        await channel.send(embed=embed, view=view)
 
     async def send_command_help(self, command):
         CmdName = (command.qualified_name).upper()
         embed = discord.Embed(title=CmdName,
-                              description=f">>> **{command.help}**")
+                              description=f">>> **{command.help}**", color=BotColours.main())
         embed.add_field(name="<:icon_usage:947347839518920714> Usage",
                         value=f"**```\n{self.get_syntax(command)}\n```**")
         alias = command.aliases
