@@ -497,6 +497,7 @@ __Example__ :
 
 # TODO Calculate Points Command #2 = c2
 
+
     @commands.command(name='calculate2', aliases=["c2", "calc2"], case_insensitive=True, help='''
 Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People Who Don't Understand Calculate1 Method
 ''')
@@ -608,7 +609,7 @@ Send The Points System In The Format
             SlotlistOnly = SlotlistLineSplit
 
         SlotlistFinal = []
-        for i in [')', '=>', '>', '|']:
+        for i in [')', '=>', '>', '|', '-']:
             for team in SlotlistOnly:
                 if i in team:
                     ele = ((team.split(i))[1].strip())
