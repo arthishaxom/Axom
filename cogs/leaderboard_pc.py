@@ -5,6 +5,9 @@ from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 from discord.utils import get
 from Utilities.helpful_lb import top20, top25
+import functools
+import io
+from Utilities.BotColoursInfo import BotColours
 
 
 class Leaderboard(commands.Cog):
@@ -21,20 +24,24 @@ class Leaderboard(commands.Cog):
             await ctx.send("Role Is Already Created")
             return
         else:
-            await guilded.create_role(name="PT-Mod", color=discord.Colour.gold())
+            await guilded.create_role(name="PT-Mod", color=BotColours.main())
             await ctx.send("Created Role!, Now People With This Role Can Use My Commands Even If They Don't Have Manage_Messages Perms.")
 
     @commands.command(name='preview', aliases=['prev', 'pv'], case_insensitive=True, help="Shows The Leaderboards Preview")
     @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
     async def _preview(self, ctx):
-        pic = discord.Embed(title="__BOARD 1__", color=discord.Colour.gold())
+        pic = discord.Embed(title="__BOARD 1__", color=BotColours.main())
         file = discord.File(r'./PREVS/BOARD-1.png')
         pic.set_image(url='attachment://BOARD-1.png')
-        pic2 = discord.Embed(title="__BOARD 2__", color=discord.Colour.gold())
+        pic2 = discord.Embed(title="__BOARD 2__", color=BotColours.main())
         file2 = discord.File(r'./PREVS/BOARD-2.png')
         pic2.set_image(url='attachment://BOARD-2.png')
+        pic3 = discord.Embed(title="__BOARD 2__", color=BotColours.main())
+        file3 = discord.File(r'./PREVS/BOARD-3.png')
+        pic3.set_image(url='attachment://BOARD-3.png')
         await ctx.send(file=file, embed=pic)
         await ctx.send(file=file2, embed=pic2)
+        await ctx.send(file=file3, embed=pic3)
 
     @commands.command(name="leaderboard", aliases=['leaderb', 'lb'], case_insensitive=True, help='''Makes The Leaderboards As Per This Format:
 **```
@@ -52,168 +59,26 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
     async def _leaderboard(self, ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
-        try:
-            embed1 = discord.Embed(title='**__SEND FORMAT__**', description='''
-**```
-TEAM1,TEAM2,...
-CHICKEN1,CHICKEN2,...
-POSITON1,POSTION2,...
-KILL1,KILL2,...
-TOTAL1,TOTAL2,...
-```**
-''', color=discord.Colour.gold())
-            embed1.set_footer(text='Besure To Have Atleast 2 Teams')
-            embed_msg = await ctx.send(embed=embed1)
-            try:
-                msg = await self.client.wait_for("message", timeout=30, check=check)
-            except asyncio.TimeoutError:
-                embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
-                await ctx.send(embed=embed)
-                return
 
-            data = msg.content
-            datas = data.splitlines()
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
-
-        try:
-            splitedte = datas[0].split(",")
-
-            splitedcd = datas[1].split(",")
-
-            splitedpos = datas[2].split(",")
-
-            splitedkill = datas[3].split(",")
-
-            splitedtotal = datas[4].split(",")
-
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
-
-        pguilds = [667103945503670282]
-        if ctx.message.guild.id not in pguilds:
-            embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
-> Title,Subitle
-> Example : T3 SCRIMS,XYZ ESPORTS
-<a:red:938971541662761001> Length Of The Titles Should Under 15.
-''', color=discord.Colour.gold())
-            embed2.set_footer(text='Spaces Are Also Counted.')
-            await msg.delete()
-            await embed_msg.edit(embed=embed2)
-            try:
-                msg = await self.client.wait_for("message", timeout=60, check=check)
-            except asyncio.TimeoutError:
-                embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
-                await ctx.send(embed=embed)
-                return
-            try:
-                title = msg.content
-                title = title.split(",")
-            except Exception as e:
-                embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : \n{e}', color=discord.Colour.red())
-                await ctx.send(embed=embed)
-                return
-
-        if ctx.message.guild.id in pguilds:
-            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
-**` 1 ` T2 SCRIMS [ACOLYTE]
-` 2 ` T2Q SCRIMS [ACOLYTE]
-` 3 ` VETERAN SCRIMS [ACOLYTE]
-` 4 ` T2Q SCRIMS [ACOLYTE]**
-''', color=discord.Colour.gold())
-            await embed_msg.edit(embed=embed3)
-        else:
-            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
-**` 1 ` BOARD 1
-` 2 ` BOARD 2**
-''', color=discord.Colour.gold())
-            await embed_msg.edit(embed=embed3)
-
-        if ctx.message.guild.id in pguilds:
-            file_paths = {1: r'./RAWS/T2_AE.png', 2: r'./RAWS/T2Q_AE.png',
-                          3: r'./RAWS/VETERAN_AE.png', 4: r'./RAWS/AE-T1Q.png'}
-        else:
-            if len(splitedte) > 20:
-                file_paths = {1: r'./RAWS/BOARD-1_25.png',
-                              2: r'./RAWS/BOARD-2_25.png'}
-            else:
-                file_paths = {1: r'./RAWS/BOARD-1.png',
-                              2: r'./RAWS/BOARD-2.png'}
-
-        colors = {1: r'#25e4d4', 2: r'#ff5500'}
-
-        server_nname = ctx.message.guild.name
-        server_name = ''
-        for i in server_nname:
-            if i.isalnum():
-                server_name += i
-        try:
-            await msg.delete()
-            msg = await self.client.wait_for("message", timeout=15, check=check)
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
-        reply = msg.content
-        try:
+        def openingFile(file_paths, reply, server_name):
             lb = Image.open(f'{file_paths[int(reply)]}').convert('RGBA')
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
 
-        try:
-            copy = lb.copy()
-            copy.save(rf"./COPIES/{server_name}here.png")
-            here = Image.open(rf"./COPIES/{server_name}here.png")
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
-            await ctx.send(embed=embed)
-            return
-        #Files & Fonts
-        draw = ImageDraw.Draw(here)
-        fontsFolder = rf'./FONTS'
-        TitleFont1 = ImageFont.truetype(
-            os.path.join(fontsFolder, 'Moonrising.ttf'), 139)
-        TitleFont2 = ImageFont.truetype(
-            os.path.join(fontsFolder, 'Moonrising.ttf'), 67)
-        TextFont1 = ImageFont.truetype(
-            os.path.join(fontsFolder, 'Retroica.ttf'), 25)
-        global times_used
+            # copy =
+            # copy.save(rf"./COPIES/{server_name}here.png")
+            # here = Image.open(rf"./COPIES/{server_name}here.png")
+            here = lb.copy()
+            draw = ImageDraw.Draw(here)
+            return draw, here
 
-        await msg.delete()
-        embed4 = discord.Embed(
-            description="**Please Wait <a:icon_loading:939409269978177546>**", color=discord.Colour.gold())
-        await embed_msg.edit(embed=embed4)
+        def making_board(here, draw, TextFont1, splitedte, splitedcd, splitedpos, splitedkill, splitedtotal):
 
-        if ctx.message.guild.id not in pguilds:
-            try:
+            if ctx.message.guild.id not in pguilds:
                 if len(splitedte) > 20:
                     top25.title(draw, title, TitleFont1,
                                 TitleFont2, colors, reply)
                 else:
                     top20.title(draw, title, TitleFont1,
                                 TitleFont2, colors, reply)
-            except Exception as e:
-                embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : \n{e}', color=discord.Colour.red())
-                await ctx.send(embed=embed)
-                os.remove(rf'./COPIES/{server_name}here.png')
-                return
-
-        try:
             if len(splitedte) > 25:
                 splitedte = splitedte[:26]
                 splitedcd = splitedcd[:26]
@@ -232,25 +97,167 @@ TOTAL1,TOTAL2,...
                 top20.splitedpos(draw, splitedpos, TextFont1)
                 top20.splitedkill(draw, splitedkill, TextFont1)
                 top20.splitedtotal(draw, splitedtotal, TextFont1)
+            with io.BytesIO() as a:
+                here.save(a, "png")
+                a.seek(0)
+                file = discord.File(
+                    a, filename=rf"{server_name}BOARD1-RESULT.png")
+            return file
 
-            here.save(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
-            file = discord.File(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
-            embed5 = discord.Embed(
-                title="**Done <a:icon_done:939411770458640425>**", color=discord.Colour.gold())
-            embed5.set_image(
-                url=rf"attachment://{server_name}BOARD1-RESULT.png")
-            await ctx.send(embed=embed5, file=file)
-            await embed_msg.delete()
-            os.remove(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
-            os.remove(rf"./COPIES/{server_name}here.png")
+        try:
+            embed1 = discord.Embed(title='**__SEND FORMAT__**', description='''
+**```
+TEAM1,TEAM2,...
+CHICKEN1,CHICKEN2,...
+POSITON1,POSTION2,...
+KILL1,KILL2,...
+TOTAL1,TOTAL2,...
+```**
+''', color=BotColours.main())
+            embed1.set_footer(text='Besure To Have Atleast 2 Teams')
+            embed_msg = await ctx.send(embed=embed1)
+            try:
+                msg = await self.client.wait_for("message", timeout=30, check=check)
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+                await ctx.send(embed=embed)
+                return
+
+            data = msg.content
+            datas = data.splitlines()
+        except Exception as e:
+            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+                                  description=f'The Error : \n{e}', color=BotColours.error())
+            await ctx.send(embed=embed)
+            return
+
+        try:
+            splitedte = datas[0].split(",")
+
+            splitedcd = datas[1].split(",")
+
+            splitedpos = datas[2].split(",")
+
+            splitedkill = datas[3].split(",")
+
+            splitedtotal = datas[4].split(",")
 
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=discord.Colour.red())
+                                  description=f'The Error : \n{e}', color=BotColours.error())
+            await ctx.send(embed=embed)
+            return
+
+        pguilds = [667103945503670282]
+        if ctx.message.guild.id not in pguilds:
+            embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
+> Title,Subitle
+> Example : T3 SCRIMS,XYZ ESPORTS
+<a:red:938971541662761001> Length Of The Titles Should Under 15.
+''', color=BotColours.main())
+            embed2.set_footer(text='Spaces Are Also Counted.')
+            await msg.delete()
+            await embed_msg.edit(embed=embed2)
+            try:
+                msg = await self.client.wait_for("message", timeout=60, check=check)
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+                await ctx.send(embed=embed)
+                return
+            try:
+                title = msg.content
+                title = title.split(",")
+            except Exception as e:
+                embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+                                      description=f'The Error : \n{e}', color=BotColours.error())
+                await ctx.send(embed=embed)
+                return
+
+        if ctx.message.guild.id in pguilds:
+            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
+**` 1 ` T2 SCRIMS [ACOLYTE]
+` 2 ` T2Q SCRIMS [ACOLYTE]
+` 3 ` VETERAN SCRIMS [ACOLYTE]
+` 4 ` T2Q SCRIMS [ACOLYTE]**
+''', color=BotColours.main())
+            await embed_msg.edit(embed=embed3)
+        else:
+            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
+**` 1 ` BOARD 1
+` 2 ` BOARD 2
+` 3 ` BOARD 3**
+''', color=BotColours.main())
+            await embed_msg.edit(embed=embed3)
+
+        if ctx.message.guild.id in pguilds:
+            file_paths = {1: r'./RAWS/T2_AE.png', 2: r'./RAWS/T2Q_AE.png',
+                          3: r'./RAWS/VETERAN_AE.png', 4: r'./RAWS/AE-T1Q.png'}
+        else:
+            if len(splitedte) > 20:
+                file_paths = {1: r'./RAWS/BOARD-1_25.png',
+                              2: r'./RAWS/BOARD-2_25.png',
+                              3: r'./RAWS/BOARD-3_25.png', }
+            else:
+                file_paths = {1: r'./RAWS/BOARD-1.png',
+                              2: r'./RAWS/BOARD-2.png',
+                              3: r'./RAWS/BOARD-3.png', }
+
+        colors = {1: r'#25e4d4', 2: r'#ff5500', 3: r'#ff0000'}
+
+        server_nname = ctx.message.guild.name
+        server_name = ''
+        for i in server_nname:
+            if i.isalnum():
+                server_name += i
+        try:
+            await msg.delete()
+            msg = await self.client.wait_for("message", timeout=15, check=check)
+        except asyncio.TimeoutError:
+            embed = discord.Embed(
+                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+            await ctx.send(embed=embed)
+            return
+        reply = msg.content
+        await msg.delete()
+        embed4 = discord.Embed(
+            description="**Please Wait <a:icon_loading:939409269978177546>**", color=BotColours.main())
+        await embed_msg.edit(embed=embed4)
+        try:
+            fontsFolder = rf'./FONTS'
+            TitleFont1 = ImageFont.truetype(
+                os.path.join(fontsFolder, 'Moonrising.ttf'), 139)
+            TitleFont2 = ImageFont.truetype(
+                os.path.join(fontsFolder, 'Moonrising.ttf'), 67)
+            TextFont1 = ImageFont.truetype(
+                os.path.join(fontsFolder, 'Retroica.ttf'), 25)
+
+            thing = functools.partial(
+                openingFile, file_paths, reply, server_name)
+            draw, here = await self.client.loop.run_in_executor(None, thing)
+            thing = functools.partial(making_board, here, draw, TextFont1,
+                                      splitedte, splitedcd, splitedpos, splitedkill, splitedtotal)
+            file = await self.client.loop.run_in_executor(None, thing)
+            embed5 = discord.Embed(
+                title="**Done <a:icon_done:939411770458640425>**", color=BotColours.main())
+            embed5.set_image(
+                url=rf"attachment://{server_name}BOARD1-RESULT.png")
+
+            await ctx.send(embed=embed5, file=file)
+            await embed_msg.delete()
+
+            # file = discord.File(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
+            # os.remove(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
+            # os.remove(rf"./COPIES/{server_name}here.png")
+
+        except Exception as e:
+            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+                                  description=f'The Error : \n{e}', color=BotColours.error())
             embed.set_footer(text='Besure To Have Atleast 2')
             await ctx.send(embed=embed)
-            os.remove(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
-            os.remove(rf"./COPIES/{server_name}here.png")
+            # os.remove(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
+            # os.remove(rf"./COPIES/{server_name}here.png")
 
 
 async def setup(client):

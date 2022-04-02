@@ -824,13 +824,13 @@ Send The Points System In The Format
                 await ctx.send(embed=embed)
                 return
         try:
+            slotlist = msg.content
             listslot = slotlist.splitlines()
         except Exception as e:
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
                                   description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
             return
-        slotlist = msg.content
         await ctx.send('''**`Type Delimiter : 
 For Example : 3) TEAM XYZ
 Here, ) Is The Delimeter`**''')
