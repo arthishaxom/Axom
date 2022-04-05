@@ -51,12 +51,12 @@ class AxomHelp(commands.MinimalHelpCommand):
                              for k in key_order if k in cog_commands_dict}
         for cog_name, commands in cog_commands_dict.items():
             embed.add_field(
-                name=f"{emoji_order[cog_name]} {cog_name}", value=f"**`{commands}`**")
+                name=f"{emoji_order[cog_name]} {cog_name}", value=f"**`{commands}`**", inline=False)
 
-        embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value='''
+        embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value=f'''
 **<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
-<:bot:947181167990423562> | [Invite The Bot](https://discord.com/api/oauth2/authorize?client_id=908949899645706241&permissions=2952916049&scope=bot%20applications.commands)
-<:like:947180731656994866> | [Vote Me](https://top.gg/bot/880314360017338380/vote)
+<:bot:947181167990423562> | [Invite The Bot]({InviteLink})
+<:like:947180731656994866> | [Vote Me]({VoteLink})
 **
 ''')
 

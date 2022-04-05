@@ -23,7 +23,7 @@ class errors(commands.Cog):
         elif isinstance(error, commands.NotOwner):
             await ctx.send("Sorry To Break Your Heart But This Command Is Owner Only.")
         elif isinstance(error, commands.MaxConcurrencyReached):
-            await ctx.send("Bot Is Quite Busy,Try Again In 10-15 Seconds")
+            await ctx.send("Bot Is Quite Busy,Try Again In 1-2 Minutes")
         else:
             print(f"{str(error)}")
 

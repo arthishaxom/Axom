@@ -70,7 +70,7 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
             draw = ImageDraw.Draw(here)
             return draw, here
 
-        def making_board(here, draw, TextFont1, splitedte, splitedcd, splitedpos, splitedkill, splitedtotal):
+        def making_board(here, draw, TextFont1, splitedte, splitedcd, splitedpos, splitedkill, splitedtotal, pguilds):
 
             if ctx.message.guild.id not in pguilds:
                 if len(splitedte) > 20:
@@ -149,7 +149,7 @@ TOTAL1,TOTAL2,...
             await ctx.send(embed=embed)
             return
 
-        pguilds = [667103945503670282]
+        pguilds = [667103945503670282, 856152785880088587]
         if ctx.message.guild.id not in pguilds:
             embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
 > Title,Subitle
@@ -179,8 +179,7 @@ TOTAL1,TOTAL2,...
             embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
 **` 1 ` T2 SCRIMS [ACOLYTE]
 ` 2 ` T2Q SCRIMS [ACOLYTE]
-` 3 ` VETERAN SCRIMS [ACOLYTE]
-` 4 ` T2Q SCRIMS [ACOLYTE]**
+` 3 ` VETERAN SCRIMS [ACOLYTE]**
 ''', color=BotColours.main())
             await embed_msg.edit(embed=embed3)
         else:
@@ -193,7 +192,7 @@ TOTAL1,TOTAL2,...
 
         if ctx.message.guild.id in pguilds:
             file_paths = {1: r'./RAWS/T2_AE.png', 2: r'./RAWS/T2Q_AE.png',
-                          3: r'./RAWS/VETERAN_AE.png', 4: r'./RAWS/AE-T1Q.png'}
+                          3: r'./RAWS/VETERAN_AE.png'}
         else:
             if len(splitedte) > 20:
                 file_paths = {1: r'./RAWS/BOARD-1_25.png',
@@ -211,6 +210,7 @@ TOTAL1,TOTAL2,...
         for i in server_nname:
             if i.isalnum():
                 server_name += i
+        server_name = server_name[:5]
         try:
             await msg.delete()
             msg = await self.client.wait_for("message", timeout=15, check=check)
@@ -237,10 +237,10 @@ TOTAL1,TOTAL2,...
                 openingFile, file_paths, reply, server_name)
             draw, here = await self.client.loop.run_in_executor(None, thing)
             thing = functools.partial(making_board, here, draw, TextFont1,
-                                      splitedte, splitedcd, splitedpos, splitedkill, splitedtotal)
-            file = await self.client.loop.run_in_executor(None, thing)
+                                      splitedte, splitedcd, splitedpos, splitedkill, splitedtotal, pguilds)
             embed5 = discord.Embed(
                 title="**Done <a:icon_done:939411770458640425>**", color=BotColours.main())
+            file = await self.client.loop.run_in_executor(None, thing)
             embed5.set_image(
                 url=rf"attachment://{server_name}BOARD1-RESULT.png")
 
