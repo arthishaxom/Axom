@@ -1,5 +1,7 @@
 import discord
 from discord.ext import commands
+import sys
+import traceback
 
 
 class errors(commands.Cog):
@@ -25,7 +27,10 @@ class errors(commands.Cog):
         elif isinstance(error, commands.MaxConcurrencyReached):
             await ctx.send("Bot Is Quite Busy,Try Again In 1-2 Minutes")
         else:
-            print(f"{str(error)}")
+            print('Ignoring exception in command {}:'.format(
+                ctx.command), file=sys.stderr)
+            traceback.print_exception(
+                type(error), error, error.__traceback__, file=sys.stderr)
 
 
 async def setup(client):
