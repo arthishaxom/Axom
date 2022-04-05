@@ -55,8 +55,8 @@ class AxomHelp(commands.MinimalHelpCommand):
 
         embed.add_field(name='<:icon_link:947337569299996712> Useful Links', value=f'''
 **<:support:947181084863520858> | [Support Server](https://discord.gg/uW7WXxBtBW)
-<:bot:947181167990423562> | [Invite The Bot]({InviteLink})
-<:like:947180731656994866> | [Vote Me]({VoteLink})
+<:bot:947181167990423562> | [Invite The Bot]({InviteLink()})
+<:like:947180731656994866> | [Vote Me]({VoteLink()})
 **
 ''')
 
