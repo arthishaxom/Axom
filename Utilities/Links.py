@@ -1,5 +1,5 @@
 def InviteLink():
-    return "https://discord.com/api/oauth2/authorize?client_id=880314360017338380&permissions=805432529&scope=bot"
+    return "https://discord.com/api/oauth2/authorize?client_id=880314360017338380&permissions=2952916177&scope=bot%20applications.commands"
 
 
 def VoteLink():
