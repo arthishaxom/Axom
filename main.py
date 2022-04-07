@@ -1,11 +1,13 @@
 import discord
-from discord.ext import commands
 import os
 import json
 import asyncpg
+from discord.ext import commands
+from discord import app_commands
 import jishaku
 import asyncio
-import logging
+import typing
+from Utilities.BotColoursInfo import BotColours
 
 with open("config.json", 'r') as configjsonFile:
     configData = json.load(configjsonFile)
@@ -49,4 +51,30 @@ os.environ["JISHAKU_FORCE_PAGINATOR"] = "t"
 os.environ["JISHAKU_NO_DM_TRACEBACK"] = "t"
 os.environ["JISHAKU_HIDE"] = "t"
 
+
+@client.command()
+@commands.is_owner()
+async def sync(ctx, guilds: commands.Greedy[discord.Object], spec: typing.Optional[typing.Literal["~"]] = None) -> None:
+    if not guilds:
+        if spec == "~":
+            fmt = await ctx.bot.tree.sync(guild=ctx.guild)
+        else:
+            fmt = await ctx.bot.tree.sync()
+
+        await ctx.send(
+            f"Synced {len(fmt)} commands {'globally' if spec is not None else 'to the current guild.'}"
+        )
+        return
+
+    assert guilds is not None
+    fmt = 0
+    for guild in guilds:
+        try:
+            await ctx.bot.tree.sync(guild=guild)
+        except discord.HTTPException:
+            pass
+        else:
+            fmt += 1
+
+    await ctx.send(f"Synced the tree to {fmt}/{len(guilds)} guilds.")
 asyncio.run(main())
