@@ -118,7 +118,7 @@ class LeaderboardSlash(commands.Cog):
 
     @app_commands.command(name='preview', description='Preview The Leaderboards')
     @app_commands.checks.bot_has_permissions(embed_links=True)
-    @app_commands.guilds(discord.Object(id=856152785880088587), discord.Object(id=746337818388987967))
+    @app_commands.guilds(discord.Object(id=856152785880088587), discord.Object(id=746337818388987967), discord.Object(id=951110455919796254))
     # @app_commands.checks.bot_has_permissions(embed_links=True, attach_files=True)
     async def preview(self, interaction: discord.Interaction):
         pic = discord.Embed(title="BOARD 1", color=BotColours.main())
@@ -144,7 +144,7 @@ class LeaderboardSlash(commands.Cog):
     @app_commands.command(name='ptsetup', description="Makes A Role `PT-Mod`.")
     @app_commands.checks.bot_has_permissions(manage_roles=True)
     @app_commands.checks.has_permissions(manage_roles=True)
-    @app_commands.guilds(discord.Object(id=856152785880088587), discord.Object(id=746337818388987967))
+    @app_commands.guilds(discord.Object(id=856152785880088587), discord.Object(id=746337818388987967), discord.Object(id=951110455919796254))
     async def ptsetup(self, interaction: discord.Interaction):
         guilded = interaction.guild
         if get(interaction.guild.roles, name="PT-Mod"):
@@ -157,7 +157,7 @@ class LeaderboardSlash(commands.Cog):
     @app_commands.command(name="leaderboard", description='''Makes The Leaderboards.''')
     @app_commands.checks.bot_has_permissions(manage_messages=True, embed_links=True)
     @app_commands.checks.has_permissions(manage_messages=True)
-    @app_commands.guilds(discord.Object(id=856152785880088587), discord.Object(id=746337818388987967))
+    @app_commands.guilds(discord.Object(id=856152785880088587), discord.Object(id=746337818388987967), discord.Object(id=951110455919796254))
     # @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     # @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
     # @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
