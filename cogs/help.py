@@ -30,9 +30,9 @@ class AxomHelp(commands.MinimalHelpCommand):
             cog_name = getattr(cog, "qualified_name", "No Category")
             if cog_name == "AxomHelpCog":
                 continue
-            filtered = await self.filter_commands(commands, sort=False)
+            # filtered = await self.filter_commands(commands, sort=False)
             command_signatures = [
-                self.get_command_signature(c) for c in filtered]
+                self.get_command_signature(c) for c in commands]
             command
             if "serverlist" in command_signatures:
                 command_signatures.remove("serverlist")
