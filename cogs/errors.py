@@ -44,18 +44,28 @@ class errors(commands.Cog):
             await ctx.send("Bot Is Quite Busy,Try Again In 1-2 Minutes")
             return
         elif isinstance(error, commands.CheckAnyFailure):
-            if ctx.command in ['ptsetup', 'leaderboard', 'calculate1', 'calculate2']:
+            # print(type(str(ctx.command)))
+            if str(ctx.command) in ['ptsetup', 'leaderboard', 'calculate1', 'calculate2']:
                 PermsList = (error.errors[0]).missing_permissions
                 PermsList = [perm.upper() for perm in PermsList]
                 PermText = "`, `".join(PermsList)
                 embed = discord.Embed(
                     title="<:iconwarning:946654059715244033> You Are Missiong Perms", description=f"**You Do Not Have Permission To Use This Command. Be Sure That You Have The `PT-Mod` Role OR The Following Permissions: \n`{PermText}`**", color=BotColours.error())
-                await ctx.send(embed=embed)
+                try:
+                    await ctx.send(embed=embed)
+                except:
+                    await ctx.send(f"**You Do Not Have Permission To Use This Command. Be Sure That You Have The `PT-Mod` Role OR The Following Permissions: \n`{PermText}`**")
+
             else:
                 PermsList = (error.errors[0]).missing_permissions
                 PermsList = [perm.upper() for perm in PermsList]
                 PermText = "`, `".join(PermsList)
-                await ctx.send(f"<:iconwarning:946654059715244033> **You Do Not Have Permission To Use This Command. Be Sure That You Have The Following Permissions: \n`{PermText}`**")
+                embed = discord.Embed(
+                    title="<:iconwarning:946654059715244033> You Are Missiong Perms", description=f"**You Do Not Have Permission To Use This Command. Be Sure That You Have The The Following Permissions: \n`{PermText}`**", color=BotColours.error())
+                try:
+                    await ctx.send(embed=embed)
+                except:
+                    await ctx.send(f"<:iconwarning:946654059715244033> **You Do Not Have Permission To Use This Command. Be Sure That You Have The Following Permissions: \n`{PermText}`**")
         else:
             print('Ignoring exception in command {}:'.format(
                 ctx.command), file=sys.stderr)
