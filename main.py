@@ -39,7 +39,8 @@ client = commands.Bot(command_prefix='&', activity=activity,
 # client.loop.run_until_complete(create_pool())
 
 async def main():
-    async with client:
+    async with client, asyncpg.create_pool(user="postgres", password="AR0AksluCtHtOjn0qeL4", host="containers-us-west-28.railway.app", port=5828, database="railway") as pool:
+        client.pool = pool
         for filename in os.listdir('./cogs'):
             if filename.endswith('.py'):
                 await client.load_extension(f'cogs.{filename[:-3]}')

@@ -48,6 +48,8 @@ class MatchView(View):
 
 #     async def on_timeout(self):
 #         return
+
+
 class Dropdown(discord.ui.Select):
     def __init__(self, teamlist):
 
@@ -1111,7 +1113,7 @@ Send The Points System In The Format
         TotalSyntax += f" AS TotalPoints"
         # if NoOfMatches > 1:
         #     JoinSyntax += f" USING (ServerID)"
-        await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+        # await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
         async with self.client.pool.acquire() as connection:
             # create a transaction for that connection
             async with connection.transaction():
@@ -1178,5 +1180,7 @@ Send The Points System In The Format
         #     # create a transaction for that connection
         #     async with connection.transaction():
         await ctx.send("Data Inserted")
+
+
 async def setup(client):
     await client.add_cog(Points(client))
