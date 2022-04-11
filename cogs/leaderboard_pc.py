@@ -8,6 +8,41 @@ from Utilities.helpful_lb import top20, top25
 import functools
 import io
 from Utilities.BotColoursInfo import BotColours
+from discord.ui import Button, View
+
+
+class BoardButtons(Button):
+    def __init__(self, label):
+        super().__init__(label=f"Board {label}",
+                         style=discord.ButtonStyle.grey)
+
+    async def callback(self, interaction):
+        self.view.value = (self.label).split()[1]
+        self.view.clear_items()
+        await interaction.response.edit_message(view=self.view)
+        self.view.stop()
+
+
+class MySelectView(View):
+    def __init__(self, dicti):
+        super().__init__(timeout=60)
+        self.value = None
+        for i in dicti.keys():
+            self.add_item(BoardButtons(i))
+
+    @discord.ui.button(label="Preview", style=discord.ButtonStyle.blurple)
+    async def preview_callback(self, interaction, button):
+        pic = discord.Embed(title="BOARD 1", color=BotColours.main())
+        file = discord.File(r'./PREVS/BOARD-1.png')
+        pic.set_image(url='attachment://BOARD-1.png')
+        pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
+        file2 = discord.File(r'./PREVS/BOARD-2.png')
+        pic2.set_image(url='attachment://BOARD-2.png')
+        pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
+        file3 = discord.File(r'./PREVS/BOARD-3.png')
+        pic3.set_image(url='attachment://BOARD-3.png')
+        await interaction.response.defer()
+        await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
 
 
 class Leaderboard(commands.Cog):
@@ -119,6 +154,7 @@ TOTAL1,TOTAL2,...
             try:
                 msg = await self.client.wait_for("message", timeout=30, check=check)
             except asyncio.TimeoutError:
+                msg.delete()
                 embed = discord.Embed(
                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
@@ -126,7 +162,9 @@ TOTAL1,TOTAL2,...
 
             data = msg.content
             datas = data.splitlines()
+            await msg.delete()
         except Exception as e:
+            await msg.delete()
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
                                   description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
@@ -157,11 +195,11 @@ TOTAL1,TOTAL2,...
 <a:red:938971541662761001> Length Of The Titles Should Under 15.
 ''', color=BotColours.main())
             embed2.set_footer(text='Spaces Are Also Counted.')
-            await msg.delete()
             await embed_msg.edit(embed=embed2)
             try:
                 msg = await self.client.wait_for("message", timeout=60, check=check)
             except asyncio.TimeoutError:
+                await msg.delete()
                 embed = discord.Embed(
                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
@@ -170,26 +208,12 @@ TOTAL1,TOTAL2,...
                 title = msg.content
                 title = title.split(",")
             except Exception as e:
+                await msg.delete()
                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
                                       description=f'The Error : \n{e}', color=BotColours.error())
                 await ctx.send(embed=embed)
                 return
-
-        if ctx.message.guild.id in pguilds:
-            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
-**` 1 ` T2 SCRIMS [ACOLYTE]
-` 2 ` T2Q SCRIMS [ACOLYTE]
-` 3 ` VETERAN SCRIMS [ACOLYTE]**
-''', color=BotColours.main())
-            await embed_msg.edit(embed=embed3)
-        else:
-            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
-**` 1 ` BOARD 1
-` 2 ` BOARD 2
-` 3 ` BOARD 3**
-''', color=BotColours.main())
-            await embed_msg.edit(embed=embed3)
-
+            await msg.delete()
         if ctx.message.guild.id in pguilds:
             file_paths = {1: r'./RAWS/T2_AE.png', 2: r'./RAWS/T2Q_AE.png',
                           3: r'./RAWS/VETERAN_AE.png'}
@@ -203,24 +227,46 @@ TOTAL1,TOTAL2,...
                               2: r'./RAWS/BOARD-2.png',
                               3: r'./RAWS/BOARD-3.png', }
 
-        colors = {1: r'#25e4d4', 2: r'#ff5500', 3: r'#ff0000'}
+        view = MySelectView(file_paths)
 
+        if ctx.message.guild.id in pguilds:
+            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
+**` 1 ` T2 SCRIMS [ACOLYTE]
+` 2 ` T2Q SCRIMS [ACOLYTE]
+` 3 ` VETERAN SCRIMS [ACOLYTE]**
+''', color=BotColours.main())
+            # await embed_msg.edit(embed=embed3)
+        else:
+            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
+**` 1 ` BOARD 1
+` 2 ` BOARD 2
+` 3 ` BOARD 3**
+''', color=BotColours.main())
+        await embed_msg.edit(embed=embed3, view=view)
+
+        colors = {1: r'#25e4d4', 2: r'#ff5500', 3: r'#ff0000'}
         server_nname = ctx.message.guild.name
         server_name = ''
         for i in server_nname:
             if i.isalnum():
                 server_name += i
         server_name = server_name[:5]
-        try:
-            await msg.delete()
-            msg = await self.client.wait_for("message", timeout=15, check=check)
-        except asyncio.TimeoutError:
+        # try:
+        #     await msg.delete()
+        #     msg = await self.client.wait_for("message", timeout=15, check=check)
+        # except asyncio.TimeoutError:
+        #     embed = discord.Embed(
+        #         title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+        #     await ctx.send(embed=embed)
+        #     return
+        res = await view.wait()
+        if res:
             embed = discord.Embed(
                 title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-            await ctx.send(embed=embed)
+            await embed_msg.edit(embed=embed)
             return
-        reply = msg.content
-        await msg.delete()
+        reply = int(view.value)
+        # await msg.delete()
         embed4 = discord.Embed(
             description="**Please Wait <a:icon_loading:939409269978177546>**", color=BotColours.main())
         await embed_msg.edit(embed=embed4)

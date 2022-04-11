@@ -7,40 +7,9 @@ import pandas as pd
 import csv
 import copy
 from Utilities.BotColoursInfo import BotColours
+import ast
 
 
-class MatchDropdown(discord.ui.Select):
-    def __init__(self):
-
-        # Set the options that will be presented inside the dropdown
-        # global options
-        options = []
-        for i in range(10):
-            if i == 0:
-                option = discord.SelectOption(
-                    label=f'{i+1} Match')
-            else:
-                option = discord.SelectOption(
-                    label=f'{i+1} Matches')
-            options.append(option)
-        super().__init__(placeholder='No. Of Matches',
-                         min_values=1, max_values=1, options=options)
-
-    async def callback(self, interaction: discord.Interaction):
-        # opt = discord.utils.get(self.options, label=self.values[0])
-        # self.options.remove(opt)
-        self.view.value = self.values[0].split(" ")[0]
-        # self.disabled = True
-        self.view.clear_items()
-        await interaction.response.edit_message(view=self.view)
-        self.view.stop()
-
-
-class MatchView(View):
-    def __init__(self):
-        super().__init__(timeout=60)
-        self.value = None
-        self.add_item(MatchDropdown())
 # class DropdownView(discord.ui.View):
 #     def __init__(self, teamlist):
 #         super().__init__(timeout=5)
@@ -48,8 +17,6 @@ class MatchView(View):
 
 #     async def on_timeout(self):
 #         return
-
-
 class Dropdown(discord.ui.Select):
     def __init__(self, teamlist):
 
@@ -83,18 +50,30 @@ class MySelectView(View):
         self.value = None
         self.add_item(Dropdown(teamlist))
 
-    @discord.ui.button(label="Save", style=discord.ButtonStyle.green)
-    async def button_callback(self, interaction, button):
-        await interaction.response.edit_message(view=self)
-        self.value = "save"
-        self.stop()
-
     @discord.ui.button(label="Skip", style=discord.ButtonStyle.grey)
     async def no_button_callback(self, interaction, button):
         self.clear_items()
         await interaction.response.edit_message(view=self)
         self.value = "skip"
         self.stop()
+
+    @discord.ui.button(label="Next Match", style=discord.ButtonStyle.grey)
+    async def next_callback(self, interaction, button):
+        self.clear_items()
+        await interaction.response.edit_message(view=self)
+        self.value = "next"
+        self.stop()
+
+    @discord.ui.button(label="Save", style=discord.ButtonStyle.green)
+    async def button_callback(self, interaction, button):
+        await interaction.response.edit_message(view=self)
+        self.value = "save"
+        self.stop()
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if self.ctx.author.id != interaction.user.id:
+            return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
+        return True
 
     async def on_timeout(self):
         return
@@ -162,6 +141,40 @@ class PointsView(View):
         if self.ctx.author.id != interaction.user.id:
             return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
         return True
+
+
+class MatchDropdown(discord.ui.Select):
+    def __init__(self):
+
+        # Set the options that will be presented inside the dropdown
+        # global options
+        options = []
+        for i in range(10):
+            if i == 0:
+                option = discord.SelectOption(
+                    label=f'{i+1} Match')
+            else:
+                option = discord.SelectOption(
+                    label=f'{i+1} Matches')
+            options.append(option)
+        super().__init__(placeholder='No. Of Matches',
+                         min_values=1, max_values=1, options=options)
+
+    async def callback(self, interaction: discord.Interaction):
+        # opt = discord.utils.get(self.options, label=self.values[0])
+        # self.options.remove(opt)
+        self.view.value = self.values[0].split(" ")[0]
+        # self.disabled = True
+        self.view.clear_items()
+        await interaction.response.edit_message(view=self.view)
+        self.view.stop()
+
+
+class MatchView(View):
+    def __init__(self):
+        super().__init__(timeout=60)
+        self.value = None
+        self.add_item(MatchDropdown())
 
 
 class Points(commands.Cog):
@@ -601,7 +614,8 @@ Send The Points System In The Format
 2 - 4
 3 - 3
 4 - 2
-5 - 1```
+5 - 1
+```
 ''', color=BotColours.main())
             customPointsSysEmbed = await ctx.send(embed=customPointsSys)
             RawMessage = await self.client.wait_for("message", timeout=100, check=check)
@@ -893,6 +907,60 @@ Here, ) Is The Delimeter`**''')
             await ctx.send(embed=embed)
             return
 
+    @commands.command(name='createtable', aliases=["ct", "createt"], case_insensitive=True)
+    @commands.is_owner()
+    async def createtable(self, ctx):
+        async with self.client.pool.acquire() as connection:
+            # create a transaction for that connection
+            async with connection.transaction():
+                for i in range(10):
+                    await connection.execute(f'''CREATE TABLE IF NOT EXISTS Points{i+1}(ServerID BIGINT,TeamNames VARCHAR(50),WWCD{i+1} SMALLINT,Position{i+1} SMALLINT,Kills{i+1} SMALLINT,Total{i+1} SMALLINT)''')
+                    await connection.execute(f'''CREATE TABLE IF NOT EXISTS SaveInfo(ServerID BIGINT,TableNum SMALLINT,Slotlist VARCHAR(1000),LeftMatches SMALLINT, MatchPos VARCHAR(1000), MatchCd VARCHAR(1000))''')
+
+        await ctx.send("Created Table")
+
+    @commands.command(name='deletetable', aliases=["dt", "deletet"], case_insensitive=True)
+    @commands.is_owner()
+    async def deletetable(self, ctx):
+        async with self.client.pool.acquire() as connection:
+            # create a transaction for that connection
+            async with connection.transaction():
+                for i in range(10):
+                    await connection.execute(f'''DROP TABLE IF EXISTS Points{i+1}''')
+                    await connection.execute(f'''DROP TABLE IF EXISTS SaveInfo''')
+                # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+        await ctx.send("Deleted Table")
+
+    @commands.command(name='gettable', aliases=["gt", "gett"], case_insensitive=True)
+    @commands.is_owner()
+    async def gettable(self, ctx, NoOfMatches: int = 0):
+
+        PositionSyntax = "Position1"
+        WwcdSyntax = "WWCD1"
+        KillsSyntax = "Kills1"
+        TotalSyntax = "Total1"
+        JoinSyntax = ""
+        TableNumber = 0
+        for MatchNumber in range(1, NoOfMatches + 1):
+            PositionSyntax += f" + Position{MatchNumber+1}"
+            WwcdSyntax += f" + WWCD{MatchNumber+1}"
+            KillsSyntax += f" + Kills{MatchNumber+1}"
+            TotalSyntax += f" + Total{MatchNumber+1}"
+            JoinSyntax += f" INNER JOIN Points{MatchNumber+1} ON Points1.ServerID = Points{MatchNumber+1}.ServerID AND Points1.TeamNames = Points{MatchNumber+1}.TeamNames"
+        PositionSyntax += f" AS TotalPosition"
+        WwcdSyntax += f" AS TotalWWCD"
+        KillsSyntax += f" AS TotalKills"
+        TotalSyntax += f" AS TotalPoints"
+        # if NoOfMatches > 1:
+        #     JoinSyntax += f" USING (ServerID)"
+        await ctx.send(f'''SELECT Points1.TeamNames,{PositionSyntax},{WwcdSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+        async with self.client.pool.acquire() as connection:
+            # create a transaction for that connection
+            async with connection.transaction():
+                # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+                AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{PositionSyntax},{WwcdSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+        await ctx.send(AllPoints)
+
     @commands.command(name='calculate3', aliases=["c3", "calc3"], case_insensitive=True, help='''
 Database Alternative [Testing Phase]''')
     @commands.bot_has_permissions(manage_messages=True, embed_links=True)
@@ -900,141 +968,158 @@ Database Alternative [Testing Phase]''')
     async def calculate3(self, ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
-        view = MatchView()
-        embed3 = discord.Embed(
-            title="<:icon_usage:947347839518920714> How Many Matches ?", description="Send The Number Of Matches To Calculate.", color=BotColours.main())
-        MatchQuesEmbed = await ctx.send(embed=embed3, view=view)
-        # try:
-        #     NoOfMatchesRaw = await self.client.wait_for("message", timeout=120, check=check)
-        # except asyncio.TimeoutError:
-        #     await NoOfMatchesRaw.delete()
-        #     embed = discord.Embed(
-        #         title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-        #     await ctx.send(embed=embed)
-        #     return
-        res = await view.wait()
-        if res:
-            view.clear_items()
-            error_embed = discord.Embed(
-                title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-            await MatchQuesEmbed.edit(embed=error_embed, view=view)
-            return
-        NoOfMatches = int(view.value)
-        embed4 = discord.Embed(
-            title="<:icon_usage:947347839518920714> Match Input Process", description=f"**Total Matches - `{NoOfMatches}`**", color=BotColours.main())
-        await MatchQuesEmbed.edit(embed=embed4)
-
-        server_nname = ctx.message.guild.name
-        server_name = ''
-        for i in server_nname:
-            if i.isalnum():
-                server_name += i
-        PointSysQues = discord.Embed(
-            title="Select Points System", color=BotColours.main())
-        view = PointsView(ctx)
-        PointSysEmbed = await ctx.send(embed=PointSysQues, view=view)
-        res = await view.wait()
-        if res:
-            view.clear_items()
-            error_embed = discord.Embed(
-                title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-            await PointSysEmbed.edit(embed=error_embed, view=view)
-            return
-        # await PointSysEmbed.delete()
-        if view.value == "bgmi":
-            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
-                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-            mapos = {1: 15, 2: 12, 3: 10, 4: 8, 5: 6, 6: 4, 7: 2, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1,
-                     13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-        elif view.value == "ff":
-            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
-                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-            mapos = {1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1, 11: 0, 12: 0,
-                     13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-        else:
-            macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
-                    14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
-            mapos = {}
-            customPointsSys = discord.Embed(title="<:icon_usage:947347839518920714> Custom Points System", description='''
-Send The Points System In The Format
-```
-1 - 5
-2 - 4
-3 - 3
-4 - 2
-5 - 1
-```
-''', color=BotColours.main())
-            customPointsSysEmbed = await ctx.send(embed=customPointsSys)
-            RawMessage = await self.client.wait_for("message", timeout=100, check=check)
-            MessageContent = RawMessage.content
-            MessageSplit = MessageContent.splitlines()
-            LastPosition = 0
-            for i in range(len(MessageSplit)):
-                MessageSplited = MessageSplit[i].split("-")
-                mapos[int(MessageSplited[0].strip())] = int(
-                    MessageSplited[1].strip())
-                LastPosition = int(MessageSplited[0].strip())
-
-            for k in range(25 - len(MessageSplit)):
-                mapos[LastPosition+k+1] = 0
-            await customPointsSysEmbed.delete()
-
-            await RawMessage.delete()
-        AskSlotlistEmbed = discord.Embed(
-            title="<:icon_usage:947347839518920714> Send The Slotlist.", color=BotColours.main())
-        await PointSysEmbed.edit(embed=AskSlotlistEmbed)
-        try:
-            SlotlistObject = await self.client.wait_for("message", timeout=15, check=check)
-            SlotlistRaw = SlotlistObject.content
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-            await PointSysEmbed.edit(embed=embed)
-            return
-        # await AskSlotlist.delete()
-        await SlotlistObject.delete()
-        SlotlistLineSplit = SlotlistRaw.splitlines()
-        SlotlistOnly = []
-        if '@' in SlotlistLineSplit[0]:
-            for Val in SlotlistLineSplit:
-                if "<@" in Val:
-                    ele = Val.split("<@")
-                    SlotlistOnly.append(ele[0])
-        else:
-            SlotlistOnly = SlotlistLineSplit
-
-        SlotlistFinal = []
-        for i in [')', '=>', '>', '|', '-']:
-            for team in SlotlistOnly:
-                if i in team:
-                    ele = ((team.split(i))[1].strip())
-                    SlotlistFinal.append(ele)
-        TableNumber = 0
         ServerId = ctx.message.guild.id
-        for MatchNumber in range(1, NoOfMatches + 1):
-            TableNumber += 1
+        async with self.client.pool.acquire() as connection:
+            async with connection.transaction():
+                fetchval = await connection.fetch(f'''SELECT * FROM SaveInfo WHERE ServerID = $1''', ServerId)
+        if fetchval == []:
+            view = MatchView()
+            embed3 = discord.Embed(
+                title="<:icon_usage:947347839518920714> How Many Matches ?", description="Select The Number Of Matches To Calculate.", color=BotColours.main())
+            MatchQuesEmbed = await ctx.send(embed=embed3, view=view)
+            # try:
+            #     NoOfMatchesRaw = await self.client.wait_for("message", timeout=120, check=check)
+            # except asyncio.TimeoutError:
+            #     await NoOfMatchesRaw.delete()
+            #     embed = discord.Embed(
+            #         title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+            #     await ctx.send(embed=embed)
+            #     return
+            res = await view.wait()
+            if res:
+                view.clear_items()
+                error_embed = discord.Embed(
+                    title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+                await MatchQuesEmbed.edit(embed=error_embed, view=view)
+                return
+            NoOfMatches = int(view.value)
             embed4 = discord.Embed(
-                title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f"**Total Matches - `{NoOfMatches}`\nOngoing Match- `{MatchNumber}`**", color=BotColours.main())
-
+                title="<:icon_usage:947347839518920714> Match Input Process", description=f"**Total Matches - `{NoOfMatches}`**", color=BotColours.main())
             await MatchQuesEmbed.edit(embed=embed4)
+
+            server_nname = ctx.message.guild.name
+            server_name = ''
+            for i in server_nname:
+                if i.isalnum():
+                    server_name += i
+            PointSysQues = discord.Embed(
+                title="Select Points System", color=BotColours.main())
+            view = PointsView(ctx)
+            PointSysEmbed = await ctx.send(embed=PointSysQues, view=view)
+            res = await view.wait()
+            if res:
+                view.clear_items()
+                error_embed = discord.Embed(
+                    title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+                await PointSysEmbed.edit(embed=error_embed, view=view)
+                return
+            # await PointSysEmbed.delete()
+            if view.value == "bgmi":
+                macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                        14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+                mapos = {1: 15, 2: 12, 3: 10, 4: 8, 5: 6, 6: 4, 7: 2, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1,
+                         13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+            elif view.value == "ff":
+                macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                        14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+                mapos = {1: 12, 2: 9, 3: 8, 4: 7, 5: 6, 6: 5, 7: 4, 8: 3, 9: 2, 10: 1, 11: 0, 12: 0,
+                         13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+            else:
+                macd = {1: 1, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0, 13: 0,
+                        14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0, 24: 0, 25: 0}
+                mapos = {}
+                customPointsSys = discord.Embed(title="<:icon_usage:947347839518920714> Custom Points System", description='''
+    Send The Points System In The Format
+    ```
+    1 - 5
+    2 - 4
+    3 - 3
+    4 - 2
+    5 - 1
+    ```
+    ''', color=BotColours.main())
+                customPointsSysEmbed = await ctx.send(embed=customPointsSys)
+                RawMessage = await self.client.wait_for("message", timeout=100, check=check)
+                MessageContent = RawMessage.content
+                MessageSplit = MessageContent.splitlines()
+                LastPosition = 0
+                for i in range(len(MessageSplit)):
+                    MessageSplited = MessageSplit[i].split("-")
+                    mapos[int(MessageSplited[0].strip())] = int(
+                        MessageSplited[1].strip())
+                    LastPosition = int(MessageSplited[0].strip())
+
+                for k in range(25 - len(MessageSplit)):
+                    mapos[LastPosition+k+1] = 0
+                await customPointsSysEmbed.delete()
+
+                await RawMessage.delete()
+            AskSlotlistEmbed = discord.Embed(
+                title="<:icon_usage:947347839518920714> Send The Slotlist.", color=BotColours.main())
+            await PointSysEmbed.edit(embed=AskSlotlistEmbed)
+            try:
+                SlotlistObject = await self.client.wait_for("message", timeout=15, check=check)
+                SlotlistRaw = SlotlistObject.content
+            except asyncio.TimeoutError:
+                embed = discord.Embed(
+                    title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
+                await PointSysEmbed.edit(embed=embed)
+                return
+            # await AskSlotlist.delete()
+            await SlotlistObject.delete()
+            SlotlistLineSplit = SlotlistRaw.splitlines()
+            SlotlistOnly = []
+            if '@' in SlotlistLineSplit[0]:
+                for Val in SlotlistLineSplit:
+                    if "<@" in Val:
+                        ele = Val.split("<@")
+                        SlotlistOnly.append(ele[0])
+            else:
+                SlotlistOnly = SlotlistLineSplit
+
+            SlotlistFinal = []
+            for i in [')', '=>', '>', '|', '-']:
+                for team in SlotlistOnly:
+                    if i in team:
+                        ele = ((team.split(i))[1].strip())
+                        SlotlistFinal.append(ele)
+            TableNumber = 0
+        else:
+            TableNumber = fetchval[0][1]
+            SlotlistFinal = ast.literal_eval(fetchval[0][2])
+            NoOfMatches = fetchval[0][3] + TableNumber
+            mapos = ast.literal_eval(fetchval[0][4])
+            macd = ast.literal_eval(fetchval[0][5])
+            embed4 = discord.Embed(title="<:icon_usage:947347839518920714> Axom Points Calculation Process",
+                                   description=f"**Total Match - `{NoOfMatches+TableNumber}`\nOngoing Match - `{TableNumber+1}`", color=BotColours.main())
+            MatchQuesEmbed = await ctx.send(embed=embed4)
+            AskSlotlistEmbed = discord.Embed(
+                title="<:icon_usage:947347839518920714> Starting The Process.", color=BotColours.main())
+            PointSysEmbed = await ctx.send(embed=AskSlotlistEmbed)
+
+        for MatchNumber in range(1, NoOfMatches + 1-TableNumber):
+            TableNumber += 1
             TeamRank = 1
             TeamList = copy.deepcopy(SlotlistFinal)
+            embed4 = discord.Embed(
+                title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f"**Total Matches - `{NoOfMatches}`\nOngoing Match- `{TableNumber}`**", color=BotColours.main())
+
+            await MatchQuesEmbed.edit(embed=embed4)
             for i in range(len(TeamList)):
                 embed1 = discord.Embed(
                     title=f"<:icon_usage:947347839518920714> Choose The #{TeamRank} Team", color=BotColours.main())
-                view = MySelectView(ctx, TeamList)
+                inview = MySelectView(ctx, TeamList)
                 # MainEmbed = await ctx.send(embed=embed1, view=view)
 
-                await PointSysEmbed.edit(embed=embed1, view=view)
-                res = await view.wait()
+                await PointSysEmbed.edit(embed=embed1, view=inview)
+                res = await inview.wait()
                 if res:
                     view.clear_items()
                     error_embed = discord.Embed(
                         title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
-                    await PointSysEmbed.edit(embed=error_embed, view=view)
+                    await PointSysEmbed.edit(embed=error_embed, view=inview)
                     return
-                if view.value in TeamList:
+                if inview.value in TeamList:
                     try:
                         # embed2 = discord.Embed(
                         #     title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
@@ -1042,7 +1127,7 @@ Send The Points System In The Format
                         TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
                         TeamKills = int(TeamKillsQues.content)
 
-                        TeamName = view.value
+                        TeamName = inview.value
                         TeamWwcd = macd[TeamRank]
                         TeamPosPts = mapos[TeamRank]
                         TeamKillsPts = TeamKills
@@ -1054,7 +1139,7 @@ Send The Points System In The Format
                                 # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
                                 await connection.execute(f'''INSERT INTO Points{TableNumber} (ServerID,TeamNames,WWCD{TableNumber},Position{TableNumber},Kills{TableNumber},Total{TableNumber}) VALUES ($1,$2,$3,$4,$5,$6)''', ServerId, TeamName, TeamWwcd, TeamPosPts, TeamKillsPts, TeamTotalPts)
 
-                        TeamList.remove(view.value)
+                        TeamList.remove(inview.value)
                         TeamRank += 1
                         await TeamKillsQues.delete()
                         # await MainEmbed.delete()
@@ -1066,11 +1151,22 @@ Send The Points System In The Format
                         await ctx.send(embed=timeup_embed)
                         return
                 else:
-                    if view.value == "skip":
+                    if inview.value == "skip":
                         # await MainEmbed.delete()
                         TeamRank += 1
-                    else:
+                    elif inview.value == "next":
                         # await MainEmbed.delete()
+                        for i in TeamList:
+                            async with self.client.pool.acquire() as connection:
+                                # create a transaction for that connection
+                                async with connection.transaction():
+                                    # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+                                    await connection.execute(f'''INSERT INTO Points{TableNumber} (ServerID,TeamNames,WWCD{TableNumber},Position{TableNumber},Kills{TableNumber},Total{TableNumber}) VALUES ($1,$2,$3,$4,$5,$6)''', ServerId, i, 0, 0, 0, 0)
+                            TeamRank += 1
+                        for i in range(len(TeamList)):
+                            TeamList.pop()
+                        break
+                    else:
                         for i in TeamList:
                             async with self.client.pool.acquire() as connection:
                                 # create a transaction for that connection
@@ -1090,17 +1186,103 @@ Send The Points System In The Format
                             # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
                             await connection.execute(f'''INSERT INTO Points{TableNumber} (ServerID,TeamNames,WWCD{TableNumber},Position{TableNumber},Kills{TableNumber},Total{TableNumber}) VALUES ($1,$2,$3,$4,$5,$6)''', ServerId, TeamList[i], 0, 0, 0, 0)
                     TeamRank += 1
+
+            if inview.value == "save":
+                if TableNumber == NoOfMatches:
+                    async with self.client.pool.acquire() as connection:
+                        # create a transaction for that connection
+                        async with connection.transaction():
+                            # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+                            await connection.execute(f'''DELETE FROM SaveInfo WHERE ServerID = $1''', ServerId)
+                else:
+                    async with self.client.pool.acquire() as connection:
+                        # create a transaction for that connection
+                        async with connection.transaction():
+                            # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+                            await connection.execute(f'''DELETE FROM SaveInfo WHERE ServerID = $1''', ServerId)
+                            await connection.execute(f'''INSERT INTO SaveInfo (ServerID,TableNum,Slotlist,LeftMatches,MatchPos,MatchCd) VALUES ($1,$2,$3,$4,$5,$6)''', ServerId, TableNumber, f"{SlotlistFinal}", NoOfMatches-TableNumber, f"{mapos}", f"{macd}")
+                break
+
         await PointSysEmbed.delete()
         embed4 = discord.Embed(
-            title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f"**Total Match - `{NoOfMatches}`\nOngoing Match - `{MatchNumber}`\n__Completed__**", color=BotColours.main())
+            title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f"**Total Match - `{NoOfMatches}`\nOngoing Match - `{TableNumber}`\n__Completed__**", color=BotColours.main())
         await MatchQuesEmbed.edit(embed=embed4)
 
+        if inview.value == "save":
+            PositionSyntax = "Position1"
+            WwcdSyntax = "WWCD1"
+            KillsSyntax = "Kills1"
+            TotalSyntax = "Total1"
+            JoinSyntax = ""
+            # TableNumber = 0
+            for MatchNumber in range(1, TableNumber):
+                PositionSyntax += f" + Position{MatchNumber+1}"
+                WwcdSyntax += f" + WWCD{MatchNumber+1}"
+                KillsSyntax += f" + Kills{MatchNumber+1}"
+                TotalSyntax += f" + Total{MatchNumber+1}"
+                JoinSyntax += f" INNER JOIN Points{MatchNumber+1} ON Points1.ServerID = Points{MatchNumber+1}.ServerID AND Points1.TeamNames = Points{MatchNumber+1}.TeamNames"
+            PositionSyntax += f" AS TotalPosition"
+            WwcdSyntax += f" AS TotalWWCD"
+            KillsSyntax += f" AS TotalKills"
+            TotalSyntax += f" AS TotalPoints"
+            await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+            async with self.client.pool.acquire() as connection:
+                # create a transaction for that connection
+                async with connection.transaction():
+                    # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+                    AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+            # await ctx.send(AllPoints)
+            valteams = [record[0] for record in AllPoints]
+            valteamsl = ",".join(valteams)
+            valcds = [record[1] for record in AllPoints]
+            valcdc = [str(ele) for ele in valcds]
+            valcdsl = ",".join(valcdc)
+            valposs = [record[2] for record in AllPoints]
+            valpossc = [str(ele) for ele in valposs]
+            valpossl = ",".join(valpossc)
+            valkillrs = [record[3] for record in AllPoints]
+            valkillrsc = [str(ele) for ele in valkillrs]
+            valkillrsl = ",".join(valkillrsc)
+            valtotals = [record[4] for record in AllPoints]
+            valtotalsc = [str(ele) for ele in valtotals]
+            valtotalsl = ",".join(valtotalsc)
+            embed6 = discord.Embed(
+                description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=BotColours.main())
+            embed6.set_footer(text="HOLD TO COPY | USE &lb TO LEADERBOARD")
+            Header = "Team Name".ljust(
+                20) + " | " + f"Total(Kill+Pos)".rjust(10)
+            MainTextList = []
+            for i in range(len(valteams)):
+                Text = f"{valteams[i]}".ljust(
+                    20) + " | " + f"{valtotalsc[i]}({valkillrsc[i]} + {valpossc[i]})".rjust(10)
+                MainTextList.append(Text)
+
+            MainText = "\n".join(MainTextList)
+            await ctx.send(embed=embed6)
+            embed4 = discord.Embed(
+                title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f'''**Total Match - `{NoOfMatches}`\nOngoing Match - `{TableNumber}`\n__Completed__**
+```
+{Header}
+===============
+{MainText}
+```
+''', color=BotColours.main())
+            if TableNumber == NoOfMatches:
+                for i in range(NoOfMatches):
+                    async with self.client.pool.acquire() as connection:
+                        # create a transaction for that connection
+                        async with connection.transaction():
+                            # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
+                            await connection.execute(f'''DELETE FROM Points{i+1} WHERE ServerID = $1''', ServerId)
+            print("here OK Too")
+            return
         PositionSyntax = "Position1"
         WwcdSyntax = "WWCD1"
         KillsSyntax = "Kills1"
         TotalSyntax = "Total1"
         JoinSyntax = ""
-        TableNumber = 0
+        # TableNumber = 0
+
         for MatchNumber in range(1, NoOfMatches):
             PositionSyntax += f" + Position{MatchNumber+1}"
             WwcdSyntax += f" + WWCD{MatchNumber+1}"
@@ -1113,7 +1295,7 @@ Send The Points System In The Format
         TotalSyntax += f" AS TotalPoints"
         # if NoOfMatches > 1:
         #     JoinSyntax += f" USING (ServerID)"
-        # await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+        await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
         async with self.client.pool.acquire() as connection:
             # create a transaction for that connection
             async with connection.transaction():
@@ -1150,6 +1332,7 @@ Send The Points System In The Format
             title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f'''**Total Match - `{NoOfMatches}`\nOngoing Match - `{MatchNumber}`\n__Completed__**
 ```
 {Header}
+===============
 {MainText}
 ```
 ''', color=BotColours.main())
@@ -1160,6 +1343,7 @@ Send The Points System In The Format
                 async with connection.transaction():
                     # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
                     await connection.execute(f'''DELETE FROM Points{i+1} WHERE ServerID = $1''', ServerId)
+                    await connection.execute(f'''DELETE FROM SaveInfo WHERE ServerID = $1''', ServerId)
         # server_nname = ctx.message.guild.name
         # server_name = ''
         # for i in server_nname:
