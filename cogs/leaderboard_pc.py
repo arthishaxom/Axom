@@ -44,6 +44,14 @@ class MySelectView(View):
         await interaction.response.defer()
         await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
 
+    async def interaction_check(self, interaction: discord.Interaction):
+        if self.ctx.author.id != interaction.user.id:
+            return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
+        return True
+
+    async def on_timeout(self):
+        return
+
 
 class Leaderboard(commands.Cog):
 
