@@ -163,7 +163,7 @@ TOTAL1,TOTAL2,...
             try:
                 msg = await self.client.wait_for("message", timeout=30, check=check)
             except asyncio.TimeoutError:
-                msg.delete()
+
                 embed = discord.Embed(
                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
@@ -173,6 +173,7 @@ TOTAL1,TOTAL2,...
             datas = data.splitlines()
             await msg.delete()
         except Exception as e:
+
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
                                   description=f'The Error : \n{e}', color=BotColours.error())
             await ctx.send(embed=embed)
@@ -207,6 +208,7 @@ TOTAL1,TOTAL2,...
             try:
                 msg = await self.client.wait_for("message", timeout=60, check=check)
             except asyncio.TimeoutError:
+
                 embed = discord.Embed(
                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
                 await ctx.send(embed=embed)
@@ -215,6 +217,7 @@ TOTAL1,TOTAL2,...
                 title = msg.content
                 title = title.split(",")
             except Exception as e:
+
                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
                                       description=f'The Error : \n{e}', color=BotColours.error())
                 await ctx.send(embed=embed)
