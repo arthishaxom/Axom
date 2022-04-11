@@ -24,8 +24,9 @@ class BoardButtons(Button):
 
 
 class MySelectView(View):
-    def __init__(self, dicti):
+    def __init__(self, ctx, dicti):
         super().__init__(timeout=60)
+        self.ctx = ctx
         self.value = None
         for i in dicti.keys():
             self.add_item(BoardButtons(i))
@@ -235,7 +236,7 @@ TOTAL1,TOTAL2,...
                               2: r'./RAWS/BOARD-2.png',
                               3: r'./RAWS/BOARD-3.png', }
 
-        view = MySelectView(file_paths)
+        view = MySelectView(ctx, file_paths)
 
         if ctx.message.guild.id in pguilds:
             embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
