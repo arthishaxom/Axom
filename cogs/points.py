@@ -1132,7 +1132,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
             WwcdSyntax += f" AS TotalWWCD"
             KillsSyntax += f" AS TotalKills"
             TotalSyntax += f" AS TotalPoints"
-            await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+            # await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
             async with self.client.pool.acquire() as connection:
                 # create a transaction for that connection
                 async with connection.transaction():
