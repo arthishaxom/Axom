@@ -544,7 +544,6 @@ __Example__ :
 
 # TODO Calculate Points Command #2 = c2
 
-
     @commands.command(name='calculate2', aliases=["c2", "calc2"], case_insensitive=True, help='''
 Does The Same As Calculate1 But Uses Buttons & Selects, A Easier Way For People Who Don't Understand Calculate1 Method
 ''')
@@ -618,7 +617,14 @@ Send The Points System In The Format
 ```
 ''', color=BotColours.main())
             customPointsSysEmbed = await ctx.send(embed=customPointsSys)
-            RawMessage = await self.client.wait_for("message", timeout=100, check=check)
+            try:
+                RawMessage = await self.client.wait_for("message", timeout=100, check=check)
+            except asyncio.TimeoutError:
+                # await TeamKillsQues.delete()
+                timeup_embed = discord.Embed(
+                    title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
+                await ctx.send(embed=timeup_embed)
+                return
             MessageContent = RawMessage.content
             MessageSplit = MessageContent.splitlines()
             LastPosition = 0
@@ -1039,7 +1045,14 @@ Database Alternative [Testing Phase]''')
     ```
     ''', color=BotColours.main())
                 customPointsSysEmbed = await ctx.send(embed=customPointsSys)
-                RawMessage = await self.client.wait_for("message", timeout=100, check=check)
+                try:
+                    RawMessage = await self.client.wait_for("message", timeout=100, check=check)
+                except asyncio.TimeoutError:
+                    # await TeamKillsQues.delete()
+                    timeup_embed = discord.Embed(
+                        title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
+                    await ctx.send(embed=timeup_embed)
+                    return
                 MessageContent = RawMessage.content
                 MessageSplit = MessageContent.splitlines()
                 LastPosition = 0

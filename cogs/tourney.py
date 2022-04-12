@@ -181,7 +181,7 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneyunhide", aliases=["tunhide", "tuh"], case_insensitive=True, help="Unhides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneyunhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -230,7 +230,7 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneyhide", aliases=["thide", "th"], case_insensitive=True, help="Hides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
-    @commands.check_any(commands.has_permissions(manage_guild=True), commands.is_owner())
+    @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneyhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
@@ -260,7 +260,7 @@ class TourneyHelpers(commands.Cog):
 
     @ commands.command(name="tourneyinfo", aliases=["tinfo", "ti"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
     @ commands.bot_has_permissions(manage_messages=True, embed_links=True)
-    @ commands.check_any(commands.has_permissions(manage_guild=True, manage_messages=True), commands.is_owner())
+    @ commands.check_any(commands.has_permissions(manage_messages=True), commands.is_owner())
     async def tourneyinfo(self, ctx):
         # // category: discord.CategoryChannel
         def check(msg):
@@ -475,7 +475,11 @@ Example - ` 2000,1000,500,500mvp `**
         await msg.delete()
         # todo GETTING SERVER INFO
         guild_name = ctx.guild.name
-        guild_avatar = ctx.guild.icon.url
+        if ctx.guild.icon == None:
+            guild_avatar = self.client.user.display_avatar.url
+        else:
+            guild_avatar = ctx.guild.icon.url
+        # guild_avatar = ctx.guild.icon.url
 
         # // async with aiohttp.ClientSession() as session:
         # //     async with session.get(guild_avatar) as raw:
