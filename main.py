@@ -15,7 +15,6 @@ with open("config.json", 'r') as configjsonFile:
 
 intents = discord.Intents.default()
 intents.message_content = True
-intents.members = True
 
 times_used = 0
 activity = discord.Activity(
