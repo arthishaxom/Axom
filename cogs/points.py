@@ -545,12 +545,16 @@ class Points(commands.Cog):
 # TODO Calculate Points Command #2 = c2
 
     @commands.command(name='calculate1', aliases=["c1", "calc1"], case_insensitive=True, help='''
-This Is A Backup Calculation In Case The Other Method Fails.''')
+This Is Just A Experimental Command. Use &calculate2 Instead''')
     @commands.bot_has_permissions(manage_messages=True, embed_links=True)
     @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
     async def calculate1(self, ctx):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
+
+        if ctx.guild.id != 856152785880088587:
+            await ctx.send("This Command Is For Experimental Purposes Only!, Join The Support Server If You want To Know More About It [Link in &help], Use `&calculat2` Instead")
+            return
         embed3 = discord.Embed(
             title="<:icon_usage:947347839518920714> How Many Matches ?", description="Send The Number Of Matches To Calculate.", color=BotColours.main())
         MatchQuesEmbed = await ctx.send(embed=embed3)
@@ -569,6 +573,10 @@ This Is A Backup Calculation In Case The Other Method Fails.''')
             await NoOfMatchesRaw.add_reaction("❌")
             return
         await NoOfMatchesRaw.delete()
+
+        if NoOfMatches > 3:
+            await ctx.send("`MAX NUMBER OF MATCHES THORUGH THIS COMMAND IS 3 MATCH, SINCE THIS IS JUST A BACKUP COMMAND`")
+            return
 
         embed4 = discord.Embed(
             title="<:icon_usage:947347839518920714> Match Input Process", description=f"**Total Matches - `{NoOfMatches}`**", color=BotColours.main())
