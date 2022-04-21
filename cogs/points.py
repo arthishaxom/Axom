@@ -64,7 +64,7 @@ class MySelectView(View):
         self.value = "next"
         self.stop()
 
-    @discord.ui.button(label="Save", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="Save", style=discord.ButtonStyle.green, emoji="<:Save_Icon:966572419705892925>")
     async def button_callback(self, interaction, button):
         await interaction.response.edit_message(view=self)
         self.value = "save"
@@ -543,6 +543,7 @@ class Points(commands.Cog):
 
 
 # TODO Calculate Points Command #2 = c2
+
 
     @commands.command(name='calculate1', aliases=["c1", "calc1"], case_insensitive=True, help='''
 This Is Just A Experimental Command. Use &calculate2 Instead''')
@@ -1210,7 +1211,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
         TotalSyntax += f" AS TotalPoints"
         # if NoOfMatches > 1:
         #     JoinSyntax += f" USING (ServerID)"
-        await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+        # await ctx.send(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
         async with self.client.pool.acquire() as connection:
             # create a transaction for that connection
             async with connection.transaction():
