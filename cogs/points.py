@@ -544,7 +544,6 @@ class Points(commands.Cog):
 
 # TODO Calculate Points Command #2 = c2
 
-
     @commands.command(name='calculate1', aliases=["c1", "calc1"], case_insensitive=True, help='''
 This Is Just A Experimental Command. Use &calculate2 Instead''')
     @commands.bot_has_permissions(manage_messages=True, embed_links=True)
@@ -1264,57 +1263,57 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
         #     async with connection.transaction():
         # await ctx.send("Data Inserted")
 
-    @commands.command(name="slotlist", aliases=['sl', 'slot'], case_insensitive=True, help="Give You The Slotlist Format For The `c1` Calculation Method.")
-    @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
-    @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
-    async def slotlist(self, ctx):
-        def check(msg):
-            return msg.author == ctx.author and msg.channel == ctx.channel
-        try:
-            msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
-        except:
-            await ctx.send("**`Send Slotlist`**")
-            try:
-                msg = await self.client.wait_for("message", timeout=120, check=check)
-            except asyncio.TimeoutError:
-                embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-                await ctx.send(embed=embed)
-                return
-        try:
-            slotlist = msg.content
-            listslot = slotlist.splitlines()
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=BotColours.error())
-            await ctx.send(embed=embed)
-            return
-        await ctx.send('''**`Type Delimiter : 
-For Example : 3) TEAM XYZ
-Here, ) Is The Delimeter`**''')
-        try:
-            input2 = await self.client.wait_for("message", timeout=120, check=check)
-        except asyncio.TimeoutError:
-            embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-            await ctx.send(embed=embed)
-            return
-        delimeter = input2.content
-        try:
-            listslot2 = []
-            for i in range(len(listslot)):
-                e = listslot[i].split(f'{delimeter}')
-                listslot2.append(e[0]+",,"+e[1].strip())
-            slotsmsg = "\n".join(listslot2)
-            await ctx.send(f"**`{slotsmsg}`**")
-            nlist = ["1,,", "2,,", "3,,", "4,,", "5,,", "6,,", "7,,", "8,,", "9,,", "10,,", "11,,", "12,,", "13,,",
-                     "14,,", "15,,", "16,,", "17,,", "18,,", "19,,", "20,,", "21,,", "22,,", "23,,", "24,,", "25,,"]
-            await ctx.send("\n".join(nlist[:len(listslot)]))
-        except Exception as e:
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=BotColours.error())
-            await ctx.send(embed=embed)
-            return
+#     @commands.command(name="slotlist", aliases=['sl', 'slot'], case_insensitive=True, help="Give You The Slotlist Format For The `c1` Calculation Method.")
+#     @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
+#     @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
+#     async def slotlist(self, ctx):
+#         def check(msg):
+#             return msg.author == ctx.author and msg.channel == ctx.channel
+#         try:
+#             msg = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+#         except:
+#             await ctx.send("**`Send Slotlist`**")
+#             try:
+#                 msg = await self.client.wait_for("message", timeout=120, check=check)
+#             except asyncio.TimeoutError:
+#                 embed = discord.Embed(
+#                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+#                 await ctx.send(embed=embed)
+#                 return
+#         try:
+#             slotlist = msg.content
+#             listslot = slotlist.splitlines()
+#         except Exception as e:
+#             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+#                                   description=f'The Error : \n{e}', color=BotColours.error())
+#             await ctx.send(embed=embed)
+#             return
+#         await ctx.send('''**`Type Delimiter :
+# For Example : 3) TEAM XYZ
+# Here, ) Is The Delimeter`**''')
+#         try:
+#             input2 = await self.client.wait_for("message", timeout=120, check=check)
+#         except asyncio.TimeoutError:
+#             embed = discord.Embed(
+#                 title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+#             await ctx.send(embed=embed)
+#             return
+#         delimeter = input2.content
+#         try:
+#             listslot2 = []
+#             for i in range(len(listslot)):
+#                 e = listslot[i].split(f'{delimeter}')
+#                 listslot2.append(e[0]+",,"+e[1].strip())
+#             slotsmsg = "\n".join(listslot2)
+#             await ctx.send(f"**`{slotsmsg}`**")
+#             nlist = ["1,,", "2,,", "3,,", "4,,", "5,,", "6,,", "7,,", "8,,", "9,,", "10,,", "11,,", "12,,", "13,,",
+#                      "14,,", "15,,", "16,,", "17,,", "18,,", "19,,", "20,,", "21,,", "22,,", "23,,", "24,,", "25,,"]
+#             await ctx.send("\n".join(nlist[:len(listslot)]))
+#         except Exception as e:
+#             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+#                                   description=f'The Error : \n{e}', color=BotColours.error())
+#             await ctx.send(embed=embed)
+#             return
 
 
 async def setup(client):
