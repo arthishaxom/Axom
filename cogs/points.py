@@ -553,7 +553,7 @@ This Is Just A Experimental Command. Use &calculate2 Instead''')
             return msg.author == ctx.author and msg.channel == ctx.channel
 
         if ctx.guild.id != 856152785880088587:
-            await ctx.send("This Command Is For Experimental Purposes Only!, Join The Support Server If You want To Know More About It [Link in &help], Use `&calculat2` Instead")
+            await ctx.send("This Command Is For Experimental Purposes Only!, Join The Support Server If You want To Know More About It [Link in &help], Use `&calculate2` Instead")
             return
         embed3 = discord.Embed(
             title="<:icon_usage:947347839518920714> How Many Matches ?", description="Send The Number Of Matches To Calculate.", color=BotColours.main())
