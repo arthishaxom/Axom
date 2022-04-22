@@ -9,7 +9,6 @@ import copy
 from Utilities.BotColoursInfo import BotColours
 import ast
 
-
 # class DropdownView(discord.ui.View):
 #     def __init__(self, teamlist):
 #         super().__init__(timeout=5)
@@ -17,6 +16,8 @@ import ast
 
 #     async def on_timeout(self):
 #         return
+
+
 class Dropdown(discord.ui.Select):
     def __init__(self, teamlist):
 
@@ -998,6 +999,9 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                     if i in team:
                         ele = ((team.split(i))[1].strip())
                         SlotlistFinal.append(ele)
+            if len(SlotlistFinal) == 0:
+                await ctx.send("**Next Time Send A Real Slotlist Like This - \n```\n1) Team1\n2)Team2\n```**")
+                return
             TableNumber = 0
         else:
             TableNumber = fetchval[0][1]
@@ -1040,7 +1044,11 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                         #     title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
                         # embed_obj = await ctx.send(embed=embed2)
                         TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
-                        TeamKills = int(TeamKillsQues.content)
+                        try:
+                            TeamKills = int(TeamKillsQues.content)
+                        except:
+                            await ctx.send("**Bruh...Send A Number For Next Team. Giving Them 0 Kills...Brrrr **")
+                            TeamKills = 0
 
                         TeamName = inview.value
                         TeamWwcd = macd[TeamRank]
