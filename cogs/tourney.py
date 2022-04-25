@@ -3,6 +3,7 @@ import asyncio
 from discord.ext import commands
 from Utilities.buttons_view import MyView
 from Utilities.BotColoursInfo import BotColours
+from discord.ext.commands.cooldowns import BucketType
 
 
 class TourneyHelpers(commands.Cog):
@@ -12,6 +13,8 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneychannels", aliases=["tchannels", "tc"], case_insensitive=True, help="Quickly Create Tourney channels")
     @commands.bot_has_permissions(manage_roles=True, manage_permissions=True, manage_channels=True, manage_messages=True, embed_links=True)
+    # @commands.dynamic_cooldown(bypass_for_owner, BucketType.guild)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneychannels(self, ctx):
         def check(msg):
@@ -133,6 +136,7 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneydelete", aliases=["tdelete", "td"], case_insensitive=True, help="Deletes The Channel Of A Category")
     @commands.bot_has_permissions(manage_permissions=True, manage_channels=True, manage_messages=True)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneydelete(self, ctx, category: discord.CategoryChannel):
         def check(msg):
@@ -181,6 +185,7 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneyunhide", aliases=["tunhide", "tuh"], case_insensitive=True, help="Unhides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneyunhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
@@ -230,6 +235,7 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneyhide", aliases=["thide", "th"], case_insensitive=True, help="Hides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneyhide(self, ctx, category: discord.CategoryChannel):
         def check(msg):
@@ -259,7 +265,7 @@ class TourneyHelpers(commands.Cog):
             return
 
     @ commands.command(name="tourneyinfo", aliases=["tinfo", "ti"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
-    @ commands.bot_has_permissions(manage_messages=True, embed_links=True)
+    @ commands.bot_has_permissions(manage_messages=True, embed_links=True, manage_webhooks=True)
     @ commands.check_any(commands.has_permissions(manage_messages=True), commands.is_owner())
     async def tourneyinfo(self, ctx):
         # // category: discord.CategoryChannel
@@ -514,28 +520,9 @@ Example - ` 2000,1000,500,500mvp `**
             await ques_embed1.edit(embed=success_embed)
             await tinfo_webhook.delete()
         except:
-            tinfo_embed = discord.Embed(description=f'''
-<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
-**{string}**
-<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
-
-**<:line_top:947143646334042122> Presented By - {guild_name}
-<:line_middle:947143807525326868> Sponsored By - {spon_name}
-<:line_middle:947143807525326868> PrizePool - {tprizepool}
-<:line_middle:947143807525326868> Total Slots - {tslots}
-<:line_bottom:947143905810473050> {extra_line}**
-''', color=BotColours.main())
-            # tinfo_embed.set_thumbnail(url=ticon)
-            tinfo_embed.set_image(url=tbanner)
-
-            tinfo_embed.add_field(
-                name="<:icon_money:951122302001635368> PrizePool Distribution", value=f"**{tppdis_string}**", inline=False)
-            await tinfo_webhook.send(username=f"{guild_name}", avatar_url=f"{guild_avatar}", embed=tinfo_embed)
-
-            success_embed = discord.Embed(
-                title="Sent The Info <:tick:946641197642956830>", color=BotColours.main())
-            await ques_embed1.edit(embed=success_embed)
-            await info_channel.send(embed=tinfo_embed)
+            error_embed = discord.Embed(
+                title="<:iconwarning:946654059715244033> No Permissions In the Mentioned Channel", color=BotColours.error())
+            await ctx.send(embed=error_embed)
 
 
 async def setup(client):
