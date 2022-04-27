@@ -32,6 +32,11 @@ class Ready(commands.Cog):
         except:
             return
 
+    @commands.Cog.listener()
+    async def on_command(self, ctx: commands.Context):
+        channel = self.client.get_channel(968758505752395796)
+
+        await channel.send(f"{ctx.author} used {ctx.command} in {ctx.guild}")
     # @tasks.loop(hours = 2)
     # async def db_check(self):
     #     channel = self.client.get_channel(918849166371868712)
