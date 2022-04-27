@@ -14,11 +14,6 @@ class Ready(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        try:
-            channel = self.client.get_channel(918849166371868712)
-            await channel.send("I Am Here So What The Fear")
-        except:
-            pass
 
         print("SAB SAHI HAI BIDU")
 
