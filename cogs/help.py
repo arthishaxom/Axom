@@ -61,7 +61,10 @@ class AxomHelp(commands.MinimalHelpCommand):
 ''')
 
         channel = self.get_destination()
-        await channel.send(embed=embed, view=view)
+        try:
+            await channel.send(embed=embed, view=view)
+        except:
+            return
 
     async def send_command_help(self, command):
         CmdName = (command.qualified_name).upper()
@@ -76,7 +79,10 @@ class AxomHelp(commands.MinimalHelpCommand):
                 name="<:icon_alias:947347903511404555> Aliases", value=f"**```\n{alias_text}\n```**", inline=False)
 
         channel = self.get_destination()
-        await channel.send(embed=embed)
+        try:
+            await channel.send(embed=embed)
+        except:
+            pass
 
 
 class AxomHelpCog(commands.Cog, command_attrs=dict(hidden=True)):

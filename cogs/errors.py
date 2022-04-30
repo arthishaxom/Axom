@@ -43,6 +43,9 @@ class errors(commands.Cog):
         elif isinstance(error, commands.MaxConcurrencyReached):
             await ctx.send("Bot Is Quite Busy,Try Again In 1-2 Minutes")
             return
+        elif isinstance(error, commands.CommandOnCooldown):
+            await ctx.send(f"This Command Is On Cooldown, Try Again In {round(error.retry_after,2)} Seconds")
+            return
         elif isinstance(error, commands.CheckAnyFailure):
             # print(type(str(ctx.command)))
             if str(ctx.command) in ['ptsetup', 'leaderboard', 'calculate1', 'calculate2']:
