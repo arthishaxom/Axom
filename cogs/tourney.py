@@ -2,7 +2,58 @@ import discord
 import asyncio
 from discord.ext import commands
 from Utilities.buttons_view import MyView
+from discord.ui import Button, View
 from Utilities.BotColoursInfo import BotColours
+from discord.ext.commands.cooldowns import BucketType
+from Utilities.cooldownfunc import bypass_for_owner
+import typing
+# embed_kills = discord.Embed(
+#     title=f"<:icon_usage:947347839518920714> What Is `{self.view.value}` Kills?", color=BotColours.main())
+# # self.disabled = True
+# self.view.clear_items()
+# await interaction.response.edit_message(embed=embed_kills, view=self.view)
+# self.view.stop()
+
+
+class SaveButton(Button):
+    def __init__(self):
+        super().__init__(label=f"Save & Post",
+                         style=discord.ButtonStyle.green)
+
+    async def callback(self, interaction):
+        self.view.value = "save"
+        self.view.clear_items()
+        await interaction.response.edit_message(view=self.view)
+        self.view.stop()
+
+
+class DiscardButton(Button):
+    def __init__(self):
+        super().__init__(label=f"Discard",
+                         style=discord.ButtonStyle.red)
+
+    async def callback(self, interaction):
+        self.view.value = "discard"
+        self.view.clear_items()
+        await interaction.response.edit_message(view=self.view)
+        self.view.stop()
+
+
+class MySelectView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.value = None
+        self.add_item(SaveButton())
+        self.add_item(DiscardButton())
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if self.ctx.author.id != interaction.user.id:
+            return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
+        return True
+
+    async def on_timeout(self):
+        return
 
 
 class TourneyHelpers(commands.Cog):
@@ -12,6 +63,9 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneychannels", aliases=["tchannels", "tc"], case_insensitive=True, help="Quickly Create Tourney channels")
     @commands.bot_has_permissions(manage_roles=True, manage_permissions=True, manage_channels=True, manage_messages=True, embed_links=True)
+    # @commands.dynamic_cooldown(bypass_for_owner, BucketType.guild)
+    @commands.dynamic_cooldown(bypass_for_owner, commands.BucketType.guild)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
     async def tourneychannels(self, ctx):
         def check(msg):
@@ -133,11 +187,15 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneydelete", aliases=["tdelete", "td"], case_insensitive=True, help="Deletes The Channel Of A Category")
     @commands.bot_has_permissions(manage_permissions=True, manage_channels=True, manage_messages=True)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
+    @commands.dynamic_cooldown(bypass_for_owner, commands.BucketType.guild)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
-    async def tourneydelete(self, ctx, category: discord.CategoryChannel):
+    async def tourneydelete(self, ctx, *, category: typing.Optional[discord.CategoryChannel] = "invalid"):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
-
+        if category == "invalid":
+            await ctx.send("**<:iconwarning:946654059715244033> Please Give A Valid Category ID/Name.**")
+            return
         ques_embed = discord.Embed(title="<:delete:946641398269083709> You Sure Want To Delete These?",
                                    description="This Category & Every Channel Under This Category Will Be Deleted.", color=BotColours.main())
         view = MyView(ctx)
@@ -181,11 +239,15 @@ class TourneyHelpers(commands.Cog):
 
     @commands.command(name="tourneyunhide", aliases=["tunhide", "tuh"], case_insensitive=True, help="Unhides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
+    @commands.dynamic_cooldown(bypass_for_owner, commands.BucketType.guild)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
-    async def tourneyunhide(self, ctx, category: discord.CategoryChannel):
+    async def tourneyunhide(self, ctx, *, category: typing.Optional[discord.CategoryChannel] = "invalid"):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
-
+        if category == "invalid":
+            await ctx.send("**<:iconwarning:946654059715244033> Please Give A Valid Category ID/Name.**")
+            return
         ques_embed = discord.Embed(title="<:delete:946641398269083709> You Sure Want To Unhide These?",
                                    description="This Category & Every Channel Under This Category Will Be Visible To Everyone.", color=BotColours.main())
         view = MyView(ctx)
@@ -228,13 +290,18 @@ class TourneyHelpers(commands.Cog):
             await ctx.send(embed=embed)
             return
 
+    # @commands.cooldown(1, 60, commands.BucketType.default)
     @commands.command(name="tourneyhide", aliases=["thide", "th"], case_insensitive=True, help="Hides The Channels Of A Category")
     @commands.bot_has_permissions(manage_channels=True)
+    @commands.dynamic_cooldown(bypass_for_owner, commands.BucketType.guild)
+    @commands.max_concurrency(5, per=commands.BucketType.default, wait=False)
     @commands.check_any(commands.has_permissions(manage_channels=True), commands.is_owner())
-    async def tourneyhide(self, ctx, category: discord.CategoryChannel):
+    async def tourneyhide(self, ctx, *, category: typing.Optional[discord.CategoryChannel] = "invalid"):
         def check(msg):
             return msg.author == ctx.author and msg.channel == ctx.channel
-
+        if category == "invalid":
+            await ctx.send("**<:iconwarning:946654059715244033> Please Give A Valid Category ID/Name.**")
+            return
         load_embed = discord.Embed(
             title="Please Wait <a:icon_loading:939409269978177546>", color=BotColours.main())
         sent_embed = await ctx.send(embed=load_embed)
@@ -258,9 +325,9 @@ class TourneyHelpers(commands.Cog):
             await sent_embed.edit(embed=embed)
             return
 
-    @ commands.command(name="tourneyinfo", aliases=["tinfo", "ti"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
-    @ commands.bot_has_permissions(manage_messages=True, embed_links=True)
-    @ commands.check_any(commands.has_permissions(manage_messages=True), commands.is_owner())
+    @commands.command(name="tourneyinfo", aliases=["tinfo", "ti"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
+    @commands.bot_has_permissions(manage_messages=True, embed_links=True, manage_webhooks=True)
+    @commands.check_any(commands.has_permissions(manage_messages=True), commands.is_owner())
     async def tourneyinfo(self, ctx):
         # // category: discord.CategoryChannel
         def check(msg):
@@ -276,7 +343,6 @@ class TourneyHelpers(commands.Cog):
         try:
             msg = await self.client.wait_for("message", timeout=100, check=check)
         except asyncio.TimeoutError:
-            await msg.delete()
             timeup_embed = discord.Embed(
                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
@@ -293,7 +359,6 @@ class TourneyHelpers(commands.Cog):
         try:
             msg = await self.client.wait_for("message", timeout=100, check=check)
         except asyncio.TimeoutError:
-            await msg.delete()
             timeup_embed = discord.Embed(
                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
@@ -314,7 +379,6 @@ Example - ` 2000,1000,500,500mvp `**
         try:
             msg = await self.client.wait_for("message", timeout=100, check=check)
         except asyncio.TimeoutError:
-            await msg.delete()
             timeup_embed = discord.Embed(
                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
@@ -347,7 +411,6 @@ Example - ` 2000,1000,500,500mvp `**
         try:
             msg = await self.client.wait_for("message", timeout=100, check=check)
         except asyncio.TimeoutError:
-            await msg.delete()
             timeup_embed = discord.Embed(
                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
@@ -426,7 +489,6 @@ Example - ` 2000,1000,500,500mvp `**
                 except:
                     tbanner = msg.content
             except asyncio.TimeoutError:
-                await msg.delete()
                 timeup_embed = discord.Embed(
                     title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
                 await ques_embed1.edit(embed=timeup_embed)
@@ -443,7 +505,6 @@ Example - ` 2000,1000,500,500mvp `**
             msg = await self.client.wait_for("message", timeout=100, check=check)
             extra_line = msg.content
         except asyncio.TimeoutError:
-            await msg.delete()
             timeup_embed = discord.Embed(
                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
@@ -458,7 +519,6 @@ Example - ` 2000,1000,500,500mvp `**
         try:
             msg = await self.client.wait_for("message", timeout=100, check=check)
         except asyncio.TimeoutError:
-            await msg.delete()
             timeup_embed = discord.Embed(
                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
             await ques_embed1.edit(embed=timeup_embed)
@@ -514,28 +574,58 @@ Example - ` 2000,1000,500,500mvp `**
             await ques_embed1.edit(embed=success_embed)
             await tinfo_webhook.delete()
         except:
-            tinfo_embed = discord.Embed(description=f'''
-<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
-**{string}**
-<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
+            error_embed = discord.Embed(
+                title="<:iconwarning:946654059715244033> No Permissions In the Mentioned Channel", color=BotColours.error())
+            await ctx.send(embed=error_embed)
 
-**<:line_top:947143646334042122> Presented By - {guild_name}
-<:line_middle:947143807525326868> Sponsored By - {spon_name}
-<:line_middle:947143807525326868> PrizePool - {tprizepool}
-<:line_middle:947143807525326868> Total Slots - {tslots}
-<:line_bottom:947143905810473050> {extra_line}**
+    @ commands.command(name="tourneyinfo2", aliases=["tinfo2", "t2"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
+    @ commands.bot_has_permissions(manage_messages=True, embed_links=True)
+    @ commands.check_any(commands.has_permissions(manage_messages=True), commands.is_owner())
+    async def tourneyinfo2(self, ctx):
+        # // category: discord.CategoryChannel
+        def check(msg):
+            return msg.author == ctx.author and msg.channel == ctx.channel
+
+        TournamentPresenter = ctx.guild.name
+        TournamentName = "Tournament Name"
+        TournamentPP = "0000"
+        TournamentPPDis = "0000,000"
+        TournamentSlots = "0000"
+
+        Main_Embed = discord.Embed(
+            title="Tournament Info Preview", description=f'''
+<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
+**__{TournamentName}__**
+<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
+<:line_top:947143646334042122> Presented By - {TournamentPresenter}
+<:line_middle:947143807525326868> Sponsored By - {TournamentPresenter}
+<:line_middle:947143807525326868> PrizePool - {TournamentPP}
+<:line_middle:947143807525326868> Total Slots - {TournamentSlots}
 ''', color=BotColours.main())
-            # tinfo_embed.set_thumbnail(url=ticon)
-            tinfo_embed.set_image(url=tbanner)
 
-            tinfo_embed.add_field(
-                name="<:icon_money:951122302001635368> PrizePool Distribution", value=f"**{tppdis_string}**", inline=False)
-            await tinfo_webhook.send(username=f"{guild_name}", avatar_url=f"{guild_avatar}", embed=tinfo_embed)
+        view = MySelectView(ctx)
+        MainMsg = await ctx.send(content=f"Sending This To {ctx.channel.mention}", embed=Main_Embed, view=view)
 
-            success_embed = discord.Embed(
-                title="Sent The Info <:tick:946641197642956830>", color=BotColours.main())
-            await ques_embed1.edit(embed=success_embed)
-            await info_channel.send(embed=tinfo_embed)
+        res = await view.wait()
+        if res:
+            embed = discord.Embed(
+                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+            await ctx.send(embed=embed)
+            return
+        # while view.value != "discard":
+        #     if view.value == "title":
+        #         await ctx.send(f"What Is The Name Of The Tournament")
+        #         try:
+        #             msg = await self.client.wait_for("message", timeout=100, check=check)
+        #             TitleVal = msg.content
+        #         except asyncio.TimeoutError:
+        #             await msg.delete()
+        #             timeup_embed = discord.Embed(
+        #                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
+        #             await ctx.send(embed=timeup_embed)
+        #             return
+        #         Main_Embed.title = TitleVal
+        #         await MainMsg.edit(content=f"Sending This To {ctx.channel.mention}", embed=Main_Embed, view=view)
 
 
 async def setup(client):
