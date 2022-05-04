@@ -15,6 +15,18 @@ import typing
 # self.view.stop()
 
 
+class CooldownModified:
+    def __init__(self, rate, per):
+        self.rate = rate
+        self.per = per
+
+    async def __call__(self, message):
+        if message.author.id == 315342835283001344:
+            return None
+        else:
+            return commands.Cooldown(self.rate, self.per)
+
+
 class SaveButton(Button):
     def __init__(self):
         super().__init__(label=f"Save & Post",
@@ -577,55 +589,6 @@ Example - ` 2000,1000,500,500mvp `**
             error_embed = discord.Embed(
                 title="<:iconwarning:946654059715244033> No Permissions In the Mentioned Channel", color=BotColours.error())
             await ctx.send(embed=error_embed)
-
-    @ commands.command(name="tourneyinfo2", aliases=["tinfo2", "t2"], case_insensitive=True, help="make & Send The Info Of A Tournament To A Channel")
-    @ commands.bot_has_permissions(manage_messages=True, embed_links=True)
-    @ commands.check_any(commands.has_permissions(manage_messages=True), commands.is_owner())
-    async def tourneyinfo2(self, ctx):
-        # // category: discord.CategoryChannel
-        def check(msg):
-            return msg.author == ctx.author and msg.channel == ctx.channel
-
-        TournamentPresenter = ctx.guild.name
-        TournamentName = "Tournament Name"
-        TournamentPP = "0000"
-        TournamentPPDis = "0000,000"
-        TournamentSlots = "0000"
-
-        Main_Embed = discord.Embed(
-            title="Tournament Info Preview", description=f'''
-<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
-**__{TournamentName}__**
-<:award_icon:954244984960327690> ━━━━━━━━━ <a:ani_crown:951433548114579477> ━━━━━━━━ <:award_icon:954244984960327690>
-<:line_top:947143646334042122> Presented By - {TournamentPresenter}
-<:line_middle:947143807525326868> Sponsored By - {TournamentPresenter}
-<:line_middle:947143807525326868> PrizePool - {TournamentPP}
-<:line_middle:947143807525326868> Total Slots - {TournamentSlots}
-''', color=BotColours.main())
-
-        view = MySelectView(ctx)
-        MainMsg = await ctx.send(content=f"Sending This To {ctx.channel.mention}", embed=Main_Embed, view=view)
-
-        res = await view.wait()
-        if res:
-            embed = discord.Embed(
-                title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-            await ctx.send(embed=embed)
-            return
-        # while view.value != "discard":
-        #     if view.value == "title":
-        #         await ctx.send(f"What Is The Name Of The Tournament")
-        #         try:
-        #             msg = await self.client.wait_for("message", timeout=100, check=check)
-        #             TitleVal = msg.content
-        #         except asyncio.TimeoutError:
-        #             await msg.delete()
-        #             timeup_embed = discord.Embed(
-        #                 title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
-        #             await ctx.send(embed=timeup_embed)
-        #             return
-        #         Main_Embed.title = TitleVal
-        #         await MainMsg.edit(content=f"Sending This To {ctx.channel.mention}", embed=Main_Embed, view=view)
 
 
 async def setup(client):

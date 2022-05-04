@@ -1002,6 +1002,9 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
             if len(SlotlistFinal) == 0:
                 await ctx.send("**Next Time Send A Real Slotlist Like This - \n```\n1) Team1\n2)Team2\n```**")
                 return
+            if len(SlotlistFinal) > 25:
+                await ctx.send("**Due To Discord Limitation You Can Only Calculate For 25 Teams, Use Excel OR Something For Calculation Then Make Leaderboard. This Will Be Solved In Near Future.**")
+                return
             TableNumber = 0
         else:
             TableNumber = fetchval[0][1]
