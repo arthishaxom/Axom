@@ -53,7 +53,7 @@ class errors(commands.Cog):
                 PermsList = [perm.upper() for perm in PermsList]
                 PermText = "`, `".join(PermsList)
                 embed = discord.Embed(
-                    title="<:iconwarning:946654059715244033> You Are Missiong Perms", description=f"**You Do Not Have Permission To Use This Command. Be Sure That You Have The `PT-Mod` Role OR The Following Permissions: \n`{PermText}`**", color=BotColours.error())
+                    title="<:iconwarning:946654059715244033> You Are Missing Permissions", description=f"**You Do Not Have Permission To Use This Command. Be Sure That You Have The `PT-Mod` Role OR The Following Permissions: \n`{PermText}`**", color=BotColours.error())
                 try:
                     await ctx.send(embed=embed)
                 except:

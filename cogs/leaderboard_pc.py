@@ -9,6 +9,106 @@ import functools
 import io
 from Utilities.BotColoursInfo import BotColours
 from discord.ui import Button, View
+import traceback
+from Utilities.cooldownfunc import bypass_for_owner2
+
+
+class Feedback(discord.ui.Modal, title='LeaderBoard Input'):
+    # Our modal classes MUST subclass `discord.ui.Modal`,
+    # but the title can be whatever you want.
+
+    # This will be a short input, where the user can enter their name
+    # It will also have a placeholder, as denoted by the `placeholder` kwarg.
+    # By default, it is required and is a short-style input which is exactly
+    # what we want.
+    maintitle = discord.ui.TextInput(
+        label='Title',
+        placeholder='Example - T3 SCRIMS',
+        required=True
+    )
+    subtitle = discord.ui.TextInput(
+        label='Subtitle',
+        placeholder='Example - XYZ ESPORTS',
+        required=True
+    )
+
+    # This is a longer, paragraph style input, where user can submit feedback
+    # Unlike the name, it is not required. If filled out, however, it will
+    # only accept a maximum of 300 characters, as denoted by the
+    # `max_length=300` kwarg.
+    maindata = discord.ui.TextInput(
+        label='Points',
+        style=discord.TextStyle.long,
+        placeholder='''TEAM1,TEAM2,...
+CHICKEN1,CHICKEN2,...
+POSITON1,POSTION2,...
+KILL1,KILL2,...
+TOTAL1,TOTAL2,...''',
+        required=True,
+    )
+
+    async def on_submit(self, interaction: discord.Interaction):
+        self.interaction = interaction
+        await self.interaction.response.defer()
+        self.stop()
+
+    async def on_error(self, error: Exception, interaction: discord.Interaction) -> None:
+        await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
+
+        # Make sure we know what the error actually is
+        traceback.print_tb(error.__traceback__)
+
+
+class MyView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+        self.value = None
+        self.response = None
+
+    @discord.ui.button(label="Continue", style=discord.ButtonStyle.green)
+    async def button_callback(self, interaction, button):
+        feedback_modal = Feedback()
+        await interaction.response.send_modal(feedback_modal)
+        # await interaction.response.send_message(view=self)
+        try:
+            await feedback_modal.wait()
+            self.value = [feedback_modal.maintitle.value,
+                          feedback_modal.subtitle.value, feedback_modal.maindata.value]
+            self.stop()
+        except:
+            pass
+
+    @discord.ui.button(label="Cancel", style=discord.ButtonStyle.red)
+    async def no_button_callback(self, interaction, button):
+        for item in self.children:
+            item.disabled = True
+        await interaction.response.defer()
+        await interaction.message.edit(view=self)
+        self.value = "no"
+        self.stop()
+
+    @discord.ui.button(emoji="<:Icon_Ques:970222585088466984>", style=discord.ButtonStyle.grey)
+    async def help_callback(self, interaction, button):
+        await interaction.response.send_message('''
+For Getting Points In This Format, You Can Use The `&calculate2` Command, Which Gives You The Points In The Format, You Just Have To Copy It.
+> **If You Already Have The Points __Calculated & Sorted__ Then Just Write Them In The Format Mentioned And Keep It Copied**
+If You Have Any Other Issue, You Can Join The Support Server: 
+https://discord.gg/uW7WXxBtBW
+''', ephemeral=True)
+        # self.value = "help"
+        # self.stop()
+
+    async def on_timeout(self):
+        for item in self.children:
+            item.disabled = True
+        await self.response.edit(content="**Timeouted**", view=self)
+        return
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if self.ctx.author.id != interaction.user.id:
+            return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
+        return True
 
 
 class BoardButtons(Button):
@@ -99,6 +199,7 @@ TOTAL1,TOTAL2,...
 Use `&c1` Or `&c2` To Get The Points In This Format.''')
     @commands.max_concurrency(1, per=commands.BucketType.default, wait=False)
     @commands.bot_has_permissions(manage_messages=True, embed_links=True, attach_files=True)
+    @commands.dynamic_cooldown(bypass_for_owner2, commands.BucketType.guild)
     @commands.check_any(commands.has_permissions(manage_messages=True), commands.has_role('PT-Mod'), commands.is_owner())
     async def _leaderboard(self, ctx):
         def check(msg):
@@ -147,9 +248,9 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
                 file = discord.File(
                     a, filename=rf"{server_name}BOARD1-RESULT.png")
             return file
-
-        try:
-            embed1 = discord.Embed(title='**__SEND FORMAT__**', description='''
+        view = MyView(ctx)
+        embed1 = discord.Embed(title='**GETTING STARTED**', description='''
+For Making Leaderboards, You Would Need The Points In The Following Format:
 **```
 TEAM1,TEAM2,...
 CHICKEN1,CHICKEN2,...
@@ -157,28 +258,38 @@ POSITON1,POSTION2,...
 KILL1,KILL2,...
 TOTAL1,TOTAL2,...
 ```**
+> **If You Don't Know How To Make This Format Click On The "<:Icon_Ques:970222585088466984>" Button.**
 ''', color=BotColours.main())
-            embed1.set_footer(text='Besure To Have Atleast 2 Teams')
-            embed_msg = await ctx.send(embed=embed1)
-            try:
-                msg = await self.client.wait_for("message", timeout=30, check=check)
-            except asyncio.TimeoutError:
-
-                embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-                await ctx.send(embed=embed)
-                return
-
-            data = msg.content
-            datas = data.splitlines()
-            await msg.delete()
-        except Exception as e:
-
-            embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=BotColours.error())
-            await ctx.send(embed=embed)
+        embed1.set_footer(text='Be Sure To Have Atleast 2 Teams')
+        embed_msg = await ctx.send(embed=embed1, view=view)
+        view.response = embed_msg
+        # try:
+        #     msg = await self.client.wait_for("message", timeout=30, check=check)
+        # except asyncio.TimeoutError:
+        #     msg.delete()
+        #     embed = discord.Embed(
+        #         title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+        #     await ctx.send(embed=embed)
+        #     return
+        res = await view.wait()
+        if res:
             return
-
+        if view.value == "no":
+            return
+        Modal_DataList = view.value
+        title = [Modal_DataList[0], Modal_DataList[1]]
+        data = Modal_DataList[2]
+        datas = data.splitlines()
+        # except Exception as e:
+        #     embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+        #                           description=f'The Error : \n{e}', color=BotColours.error())
+        #     await ctx.send(embed=embed)
+        #     return
+        if len(datas) < 5:
+            view.clear_items()
+            await embed_msg.edit(view=view)
+            await ctx.send(f'**<:iconwarning:946654059715244033> Please Send Correct Points Format.**')
+            return
         try:
             splitedte = datas[0].split(",")
 
@@ -196,33 +307,33 @@ TOTAL1,TOTAL2,...
             await ctx.send(embed=embed)
             return
 
-        pguilds = [667103945503670282, 856152785880088587]
-        if ctx.message.guild.id not in pguilds:
-            embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
-> Title,Subitle
-> Example : T3 SCRIMS,XYZ ESPORTS
-<a:red:938971541662761001> Length Of The Titles Should Under 15.
-''', color=BotColours.main())
-            embed2.set_footer(text='Spaces Are Also Counted.')
-            await embed_msg.edit(embed=embed2)
-            try:
-                msg = await self.client.wait_for("message", timeout=60, check=check)
-            except asyncio.TimeoutError:
-
-                embed = discord.Embed(
-                    title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-                await ctx.send(embed=embed)
-                return
-            try:
-                title = msg.content
-                title = title.split(",")
-            except Exception as e:
-
-                embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                      description=f'The Error : \n{e}', color=BotColours.error())
-                await ctx.send(embed=embed)
-                return
-            await msg.delete()
+        pguilds = [667103945503670282]
+#         if ctx.message.guild.id not in pguilds:
+#             embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
+# > Title,Subitle
+# > Example : T3 SCRIMS,XYZ ESPORTS
+# <a:red:938971541662761001> Length Of The Titles Should Under 15.
+# ''', color=BotColours.main())
+#             embed2.set_footer(text='Spaces Are Also Counted.')
+#             await embed_msg.edit(embed=embed2)
+#             try:
+#                 msg = await self.client.wait_for("message", timeout=60, check=check)
+#             except asyncio.TimeoutError:
+#                 await msg.delete()
+#                 embed = discord.Embed(
+#                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
+#                 await ctx.send(embed=embed)
+#                 return
+#             try:
+#                 title = msg.content
+#                 title = title.split(",")
+#             except Exception as e:
+#                 await msg.delete()
+#                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
+#                                       description=f'The Error : \n{e}', color=BotColours.error())
+#                 await ctx.send(embed=embed)
+#                 return
+#             await msg.delete()
         if ctx.message.guild.id in pguilds:
             file_paths = {1: r'./RAWS/T2_AE.png', 2: r'./RAWS/T2Q_AE.png',
                           3: r'./RAWS/VETERAN_AE.png'}
