@@ -52,7 +52,7 @@ TOTAL1,TOTAL2,...''',
         await self.interaction.response.defer()
         self.stop()
 
-    async def on_error(self, error: Exception, interaction: discord.Interaction) -> None:
+    async def on_error(self, interaction: discord.Interaction, error: Exception) -> None:
         await interaction.response.send_message('Oops! Something went wrong.', ephemeral=True)
 
         # Make sure we know what the error actually is
