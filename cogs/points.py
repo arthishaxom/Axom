@@ -545,6 +545,7 @@ class Points(commands.Cog):
 
 # TODO Calculate Points Command #2 = c2
 
+
     @commands.command(name='calculate1', aliases=["c1", "calc1"], case_insensitive=True, help='''
 This Is Just A Experimental Command. Use &calculate2 Instead''')
     @commands.bot_has_permissions(manage_messages=True, embed_links=True)
@@ -1156,7 +1157,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                 # create a transaction for that connection
                 async with connection.transaction():
                     # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
-                    AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+                    AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} WHERE ServerID = $1 ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''', ServerId)
             # await ctx.send(AllPoints)
             valteams = [record[0] for record in AllPoints]
             valteamsl = ",".join(valteams)
@@ -1226,7 +1227,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
             # create a transaction for that connection
             async with connection.transaction():
                 # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
-                AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''')
+                AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} WHERE ServerID = $1 ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''', ServerId)
         # await ctx.send(AllPoints)
         valteams = [record[0] for record in AllPoints]
         valteamsl = ",".join(valteams)
