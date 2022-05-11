@@ -1041,7 +1041,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                 await PointSysEmbed.edit(embed=embed1, view=inview)
                 res = await inview.wait()
                 if res:
-                    view.clear_items()
+                    inview.clear_items()
                     error_embed = discord.Embed(
                         title=f'<:icon_error:947347839518920714> Timeout Error. Please Try Again.', color=BotColours.error())
                     await PointSysEmbed.edit(embed=error_embed, view=inview)
@@ -1051,7 +1051,14 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                         # embed2 = discord.Embed(
                         #     title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
                         # embed_obj = await ctx.send(embed=embed2)
-                        TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
+                        try:
+                            TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
+                        except asyncio.TimeoutError:
+                            # await TeamKillsQues.delete()
+                            timeup_embed = discord.Embed(
+                                title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
+                            await ctx.send(embed=timeup_embed)
+                            return
                         try:
                             TeamKills = int(TeamKillsQues.content)
                         except:
