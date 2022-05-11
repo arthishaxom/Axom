@@ -960,11 +960,15 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                 MessageContent = RawMessage.content
                 MessageSplit = MessageContent.splitlines()
                 LastPosition = 0
-                for i in range(len(MessageSplit)):
-                    MessageSplited = MessageSplit[i].split("-")
-                    mapos[int(MessageSplited[0].strip())] = int(
-                        MessageSplited[1].strip())
-                    LastPosition = int(MessageSplited[0].strip())
+                try:
+                    for i in range(len(MessageSplit)):
+                        MessageSplited = MessageSplit[i].split("-")
+                        mapos[int(MessageSplited[0].strip())] = int(
+                            MessageSplited[1].strip())
+                        LastPosition = int(MessageSplited[0].strip())
+                except:
+                    await ctx.send("**<:icon_error:947347839518920714> Please Send Correct Format**")
+                    return
 
                 for k in range(25 - len(MessageSplit)):
                     mapos[LastPosition+k+1] = 0
@@ -1157,7 +1161,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                 # create a transaction for that connection
                 async with connection.transaction():
                     # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
-                    AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} WHERE ServerID = $1 ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''', ServerId)
+                    AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} WHERE Points1.ServerID = $1 ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''', ServerId)
             # await ctx.send(AllPoints)
             valteams = [record[0] for record in AllPoints]
             valteamsl = ",".join(valteams)
@@ -1227,7 +1231,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
             # create a transaction for that connection
             async with connection.transaction():
                 # await connection.execute(f'''DROP TABLE IF EXISTS Points''')
-                AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} WHERE ServerID = $1 ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''', ServerId)
+                AllPoints = await connection.fetch(f'''SELECT Points1.TeamNames,{WwcdSyntax},{PositionSyntax},{KillsSyntax},{TotalSyntax} FROM Points1{JoinSyntax} WHERE Points1.ServerID = $1 ORDER BY TotalPoints DESC, TotalWWCD DESC, TotalPosition DESC, TotalKills DESC LIMIT 20''', ServerId)
         # await ctx.send(AllPoints)
         valteams = [record[0] for record in AllPoints]
         valteamsl = ",".join(valteams)
