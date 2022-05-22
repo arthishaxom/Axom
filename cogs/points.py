@@ -1184,9 +1184,9 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
             valtotals = [record[4] for record in AllPoints]
             valtotalsc = [str(ele) for ele in valtotals]
             valtotalsl = ",".join(valtotalsc)
-            await ctx.send(f'''```
+            await ctx.send(f'''
 {valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}
-```''')
+''')
             if TableNumber == NoOfMatches:
                 for i in range(NoOfMatches):
                     async with self.client.pool.acquire() as connection:
@@ -1236,9 +1236,9 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
         valtotals = [record[4] for record in AllPoints]
         valtotalsc = [str(ele) for ele in valtotals]
         valtotalsl = ",".join(valtotalsc)
-        await ctx.send(f'''```
+        await ctx.send(f'''
 {valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}
-```''')
+''')
         for i in range(NoOfMatches):
             async with self.client.pool.acquire() as connection:
                 # create a transaction for that connection
