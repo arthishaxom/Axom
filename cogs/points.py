@@ -1184,27 +1184,9 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
             valtotals = [record[4] for record in AllPoints]
             valtotalsc = [str(ele) for ele in valtotals]
             valtotalsl = ",".join(valtotalsc)
-            embed6 = discord.Embed(
-                description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=BotColours.main())
-            embed6.set_footer(text="HOLD TO COPY | USE &lb TO LEADERBOARD")
-            Header = "Team Name".ljust(
-                20) + " | " + f"Total(Kill+Pos)".rjust(10)
-            MainTextList = []
-            for i in range(len(valteams)):
-                Text = f"{valteams[i]}".ljust(
-                    20) + " | " + f"{valtotalsc[i]}({valkillrsc[i]} + {valpossc[i]})".rjust(10)
-                MainTextList.append(Text)
-
-            MainText = "\n".join(MainTextList)
-            await ctx.send(embed=embed6)
-            embed4 = discord.Embed(
-                title="<:icon_usage:947347839518920714> Axom Points Calculation Process", description=f'''**Total Match - `{NoOfMatches}`\nOngoing Match - `{TableNumber}`\n__Completed__**
-```
-{Header}
-===============
-{MainText}
-```
-''', color=BotColours.main())
+            await ctx.send(f'''```
+{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}
+```''')
             if TableNumber == NoOfMatches:
                 for i in range(NoOfMatches):
                     async with self.client.pool.acquire() as connection:
@@ -1254,10 +1236,9 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
         valtotals = [record[4] for record in AllPoints]
         valtotalsc = [str(ele) for ele in valtotals]
         valtotalsl = ",".join(valtotalsc)
-        embed6 = discord.Embed(
-            description=f'{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}', color=BotColours.main())
-        embed6.set_footer(text="HOLD TO COPY | USE &lb TO LEADERBOARD")
-        await ctx.send(embed=embed6)
+        await ctx.send(f'''```
+{valteamsl}\n{valcdsl}\n{valpossl}\n{valkillrsl}\n{valtotalsl}
+```''')
         for i in range(NoOfMatches):
             async with self.client.pool.acquire() as connection:
                 # create a transaction for that connection
