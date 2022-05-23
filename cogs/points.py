@@ -545,7 +545,6 @@ class Points(commands.Cog):
 
 # TODO Calculate Points Command #2 = c2
 
-
     @commands.command(name='calculate1', aliases=["c1", "calc1"], case_insensitive=True, help='''
 This Is Just A Experimental Command. Use &calculate2 Instead''')
     @commands.bot_has_permissions(manage_messages=True, embed_links=True)
@@ -999,7 +998,7 @@ An Easy Way To Calculate Your Points For The Leaderboard Format.
                 SlotlistOnly = SlotlistLineSplit
 
             SlotlistFinal = []
-            for i in [')', '=>', '>', '|', '-']:
+            for i in [')', '=>', '>', '|', '-', ':']:
                 for team in SlotlistOnly:
                     if i in team:
                         ele = ((team.split(i))[1].strip())
