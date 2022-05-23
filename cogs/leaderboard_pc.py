@@ -4,13 +4,15 @@ import asyncio
 from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 from discord.utils import get
-from Utilities.helpful_lb import top20, top25
+from Utilities.helpful_lb import top20, top25, top10
 import functools
 import io
 from Utilities.BotColoursInfo import BotColours
 from discord.ui import Button, View
 import traceback
 from Utilities.cooldownfunc import bypass_for_owner2
+import ntpath
+import traceback
 
 
 class Feedback(discord.ui.Modal, title='LeaderBoard Input'):
@@ -113,11 +115,11 @@ https://discord.gg/uW7WXxBtBW
 
 class BoardButtons(Button):
     def __init__(self, label):
-        super().__init__(label=f"Board {label}",
+        super().__init__(label=f"{label}",
                          style=discord.ButtonStyle.grey)
 
     async def callback(self, interaction):
-        self.view.value = (self.label).split()[1]
+        self.view.value = self.label
         self.view.clear_items()
         await interaction.response.edit_message(view=self.view)
         self.view.stop()
@@ -129,7 +131,9 @@ class MySelectView(View):
         self.ctx = ctx
         self.value = None
         for i in dicti.keys():
-            self.add_item(BoardButtons(i))
+            pathoffile = dicti[i]
+            name = ntpath.basename(pathoffile)[:-4]
+            self.add_item(BoardButtons(name))
 
     @discord.ui.button(label="Preview", style=discord.ButtonStyle.blurple)
     async def preview_callback(self, interaction, button):
@@ -175,14 +179,14 @@ class Leaderboard(commands.Cog):
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     async def _preview(self, ctx):
         pic = discord.Embed(title="BOARD 1", color=BotColours.main())
-        file = discord.File(r'./PREVS/BOARD-1.png')
-        pic.set_image(url='attachment://BOARD-1.png')
+        file = discord.File(r'./PREVS/BOARD 1.png')
+        pic.set_image(url=r'attachment://BOARD 1.png')
         pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
-        file2 = discord.File(r'./PREVS/BOARD-2.png')
-        pic2.set_image(url='attachment://BOARD-2.png')
+        file2 = discord.File(r'./PREVS/BOARD 2.png')
+        pic2.set_image(url=r'attachment://BOARD 2.png')
         pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
-        file3 = discord.File(r'./PREVS/BOARD-3.png')
-        pic3.set_image(url='attachment://BOARD-3.png')
+        file3 = discord.File(r'./PREVS/BOARD 3.png')
+        pic3.set_image(url=r'attachment://BOARD 3.png')
         await ctx.send(file=file, embed=pic)
         await ctx.send(file=file2, embed=pic2)
         await ctx.send(file=file3, embed=pic3)
@@ -206,7 +210,7 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
             return msg.author == ctx.author and msg.channel == ctx.channel
 
         def openingFile(file_paths, reply, server_name):
-            lb = Image.open(f'{file_paths[int(reply)]}').convert('RGBA')
+            lb = Image.open(f'{file_paths[reply]}').convert('RGBA')
 
             # copy =
             # copy.save(rf"./COPIES/{server_name}here.png")
@@ -221,21 +225,24 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
                 if len(splitedte) > 20:
                     top25.title(draw, title, TitleFont1,
                                 TitleFont2, colors, reply)
+                elif len(splitedte) <= 10:
+                    top10.title(draw, title, TitleFont3,
+                                TitleFont4, colors, reply)
                 else:
                     top20.title(draw, title, TitleFont1,
                                 TitleFont2, colors, reply)
-            if len(splitedte) > 25:
-                splitedte = splitedte[:26]
-                splitedcd = splitedcd[:26]
-                splitedpos = splitedpos[:26]
-                splitedkill = splitedkill[:26]
-                splitedtotal = splitedtotal[:26]
             if len(splitedte) > 20:
                 top25.splitedte(draw, splitedte, TextFont1)
                 top25.splitedcd(draw, splitedcd, TextFont1)
                 top25.splitedpos(draw, splitedpos, TextFont1)
                 top25.splitedkill(draw, splitedkill, TextFont1)
                 top25.splitedtotal(draw, splitedtotal, TextFont1)
+            elif len(splitedte) <= 10:
+                top10.splitedte(draw, splitedte, TextFont1)
+                top10.splitedcd(draw, splitedcd, TextFont1)
+                top10.splitedpos(draw, splitedpos, TextFont1)
+                top10.splitedkill(draw, splitedkill, TextFont1)
+                top10.splitedtotal(draw, splitedtotal, TextFont1)
             else:
                 top20.splitedte(draw, splitedte, TextFont1)
                 top20.splitedcd(draw, splitedcd, TextFont1)
@@ -307,7 +314,7 @@ TOTAL1,TOTAL2,...
             await ctx.send(embed=embed)
             return
 
-        pguilds = [667103945503670282]
+
 #         if ctx.message.guild.id not in pguilds:
 #             embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
 # > Title,Subitle
@@ -334,37 +341,53 @@ TOTAL1,TOTAL2,...
 #                 await ctx.send(embed=embed)
 #                 return
 #             await msg.delete()
-        if ctx.message.guild.id in pguilds:
-            file_paths = {1: r'./RAWS/T2_AE.png', 2: r'./RAWS/T2Q_AE.png',
-                          3: r'./RAWS/VETERAN_AE.png'}
+        pguilds = []
+        file_paths = {}
+        limit = 25
+        async with self.client.pool.acquire() as connection:
+            async with connection.transaction():
+                data = await connection.fetch(f'''SELECT * FROM premium WHERE serverid = $1''', ctx.message.guild.id)
+                # ./RAWS/BLACKLIGHT/3 PM.png;;./RAWS/BLACKLIGHT/4 PM.png"
+        if data != []:
+            filepaths = (data[0][1]).split(";;")
+            for filepath in filepaths:
+                file_paths[ntpath.basename(filepath)[:-4]] = rf"{filepath}"
+                pguilds = [data[0][0]]
+                limit = data[0][2]
+
         else:
             if len(splitedte) > 20:
-                file_paths = {1: r'./RAWS/BOARD-1_25.png',
-                              2: r'./RAWS/BOARD-2_25.png',
-                              3: r'./RAWS/BOARD-3_25.png', }
+                file_paths = {"BOARD 1": r'./RAWS/25 STYLES/BOARD 1.png',
+                              "BOARD 2": r'./RAWS/25 STYLES/BOARD 2.png',
+                              "BOARD 3": r'./RAWS/25 STYLES/BOARD 3.png', }
+            elif len(splitedte) <= 10:
+                file_paths = {"BOARD 1": r'./RAWS/10 STYLES/BOARD 1.png',
+                              "BOARD 2": r'./RAWS/10 STYLES/BOARD 2.png',
+                              "BOARD 3": r'./RAWS/10 STYLES/BOARD 3.png', }
             else:
-                file_paths = {1: r'./RAWS/BOARD-1.png',
-                              2: r'./RAWS/BOARD-2.png',
-                              3: r'./RAWS/BOARD-3.png', }
+                file_paths = {"BOARD 1": r'./RAWS/20 STYLES/BOARD 1.png',
+                              "BOARD 2": r'./RAWS/20 STYLES/BOARD 2.png',
+                              "BOARD 3": r'./RAWS/20 STYLES/BOARD 3.png', }
 
         view = MySelectView(ctx, file_paths)
 
+        splitedte = splitedte[:limit]
+        splitedcd = splitedcd[:limit]
+        splitedpos = splitedpos[:limit]
+        splitedkill = splitedkill[:limit]
+        splitedtotal = splitedtotal[:limit]
+
         if ctx.message.guild.id in pguilds:
-            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
-**` 1 ` T2 SCRIMS [ACOLYTE]
-` 2 ` T2Q SCRIMS [ACOLYTE]
-` 3 ` VETERAN SCRIMS [ACOLYTE]**
-''', color=BotColours.main())
+            embed3 = discord.Embed(
+                title='**CHOOSE AN OPTION**', color=BotColours.main())
             # await embed_msg.edit(embed=embed3)
         else:
-            embed3 = discord.Embed(title='**__CHOOSE AN OPTION__**', description='''
-**` 1 ` BOARD 1
-` 2 ` BOARD 2
-` 3 ` BOARD 3**
-''', color=BotColours.main())
+            embed3 = discord.Embed(
+                title='**CHOOSE AN OPTION**', color=BotColours.main())
         await embed_msg.edit(embed=embed3, view=view)
 
-        colors = {1: r'#25e4d4', 2: r'#ff5500', 3: r'#ff0000'}
+        colors = {"BOARD 1": r'#25e4d4',
+                  "BOARD 2": r'#ff5500', "BOARD 3": r'#ff0000'}
         server_nname = ctx.message.guild.name
         server_name = ''
         for i in server_nname:
@@ -385,7 +408,7 @@ TOTAL1,TOTAL2,...
                 title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
             await embed_msg.edit(embed=embed)
             return
-        reply = int(view.value)
+        reply = view.value
         # await msg.delete()
         embed4 = discord.Embed(
             description="**Please Wait <a:icon_loading:939409269978177546>**", color=BotColours.main())
@@ -396,6 +419,10 @@ TOTAL1,TOTAL2,...
                 os.path.join(fontsFolder, 'Moonrising.ttf'), 139)
             TitleFont2 = ImageFont.truetype(
                 os.path.join(fontsFolder, 'Moonrising.ttf'), 67)
+            TitleFont3 = ImageFont.truetype(
+                os.path.join(fontsFolder, 'Headlines-BoldItalic.otf'), 139)
+            TitleFont4 = ImageFont.truetype(
+                os.path.join(fontsFolder, 'Headlines-BoldItalic.otf'), 80)
             TextFont1 = ImageFont.truetype(
                 os.path.join(fontsFolder, 'Retroica.ttf'), 25)
 
@@ -418,8 +445,12 @@ TOTAL1,TOTAL2,...
             # os.remove(rf"./COPIES/{server_name}here.png")
 
         except Exception as e:
+            etype = type(e)
+            trace = e.__traceback__
+            lines = traceback.format_exception(etype, e, trace)
+            traceback_text = ''.join(lines)
             embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-                                  description=f'The Error : \n{e}', color=BotColours.error())
+                                  description=f'The Error : \n{traceback_text}', color=BotColours.error())
             embed.set_footer(text='Besure To Have Atleast 2')
             await ctx.send(embed=embed)
             # os.remove(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
