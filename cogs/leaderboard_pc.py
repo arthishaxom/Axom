@@ -126,7 +126,7 @@ class BoardButtons(Button):
 
 
 class MySelectView(View):
-    def __init__(self, ctx, dicti):
+    def __init__(self, ctx, dicti, length):
         super().__init__(timeout=60)
         self.ctx = ctx
         self.value = None
@@ -134,20 +134,80 @@ class MySelectView(View):
             pathoffile = dicti[i]
             name = ntpath.basename(pathoffile)[:-4]
             self.add_item(BoardButtons(name))
+        self.length = length
 
     @discord.ui.button(label="Preview", style=discord.ButtonStyle.blurple)
     async def preview_callback(self, interaction, button):
+        if self.length > 10:
+            pic = discord.Embed(title="BOARD 1", color=BotColours.main())
+            file = discord.File(r'./PREVS/20 STYLES/BOARD-1.png')
+            pic.set_image(url=r'attachment://BOARD-1.png')
+            pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
+            file2 = discord.File(r'./PREVS/20 STYLES/BOARD-2.png')
+            pic2.set_image(url=r'attachment://BOARD-2.png')
+            pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
+            file3 = discord.File(r'./PREVS/20 STYLES/BOARD-3.png')
+            pic3.set_image(url=r'attachment://BOARD-3.png')
+            await interaction.response.defer()
+            await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
+        else:
+            pic = discord.Embed(title="BOARD 1", color=BotColours.main())
+            file = discord.File(r'./PREVS/10 STYLES/BOARD-1.png')
+            pic.set_image(url=r'attachment://BOARD-1.png')
+            pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
+            file2 = discord.File(r'./PREVS/10 STYLES/BOARD-2.png')
+            pic2.set_image(url=r'attachment://BOARD-2.png')
+            pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
+            file3 = discord.File(r'./PREVS/10 STYLES/BOARD-3.png')
+            pic3.set_image(url=r'attachment://BOARD-3.png')
+            await interaction.response.defer()
+            await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
+
+    async def interaction_check(self, interaction: discord.Interaction):
+        if self.ctx.author.id != interaction.user.id:
+            return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
+        return True
+
+    async def on_timeout(self):
+        return
+
+
+class MyPreview(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=60)
+        self.ctx = ctx
+
+    @discord.ui.button(label="Top 10", style=discord.ButtonStyle.grey)
+    async def top10_callback(self, interaction, button):
         pic = discord.Embed(title="BOARD 1", color=BotColours.main())
-        file = discord.File(r'./PREVS/BOARD-1.png')
-        pic.set_image(url='attachment://BOARD-1.png')
+        file = discord.File(r'./PREVS/10 STYLES/BOARD-1.png')
+        pic.set_image(url=r'attachment://BOARD-1.png')
         pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
-        file2 = discord.File(r'./PREVS/BOARD-2.png')
-        pic2.set_image(url='attachment://BOARD-2.png')
+        file2 = discord.File(r'./PREVS/10 STYLES/BOARD-2.png')
+        pic2.set_image(url=r'attachment://BOARD-2.png')
         pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
-        file3 = discord.File(r'./PREVS/BOARD-3.png')
-        pic3.set_image(url='attachment://BOARD-3.png')
-        await interaction.response.defer()
-        await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
+        file3 = discord.File(r'./PREVS/10 STYLES/BOARD-3.png')
+        pic3.set_image(url=r'attachment://BOARD-3.png')
+        button.disabled = True
+        await interaction.response.edit_message(view=self)
+        # await interaction.response.defer()
+        await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3])
+
+    @discord.ui.button(label="Top 20", style=discord.ButtonStyle.grey)
+    async def top20_callback(self, interaction, button):
+        pic = discord.Embed(title="BOARD 1", color=BotColours.main())
+        file = discord.File(r'./PREVS/20 STYLES/BOARD-1.png')
+        pic.set_image(url=r'attachment://BOARD-1.png')
+        pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
+        file2 = discord.File(r'./PREVS/20 STYLES/BOARD-2.png')
+        pic2.set_image(url=r'attachment://BOARD-2.png')
+        pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
+        file3 = discord.File(r'./PREVS/20 STYLES/BOARD-3.png')
+        pic3.set_image(url=r'attachment://BOARD-3.png')
+        button.disabled = True
+        await interaction.response.edit_message(view=self)
+        # await interaction.response.defer()
+        await interaction.followup.send(embeds=[pic, pic2, pic3], files=[file, file2, file3])
 
     async def interaction_check(self, interaction: discord.Interaction):
         if self.ctx.author.id != interaction.user.id:
@@ -178,18 +238,8 @@ class Leaderboard(commands.Cog):
     @commands.command(name='preview', aliases=['prev', 'pv'], case_insensitive=True, help="Shows The Leaderboards Preview")
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     async def _preview(self, ctx):
-        pic = discord.Embed(title="BOARD 1", color=BotColours.main())
-        file = discord.File(r'./PREVS/BOARD 1.png')
-        pic.set_image(url=r'attachment://BOARD 1.png')
-        pic2 = discord.Embed(title="BOARD 2", color=BotColours.main())
-        file2 = discord.File(r'./PREVS/BOARD 2.png')
-        pic2.set_image(url=r'attachment://BOARD 2.png')
-        pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
-        file3 = discord.File(r'./PREVS/BOARD 3.png')
-        pic3.set_image(url=r'attachment://BOARD 3.png')
-        await ctx.send(file=file, embed=pic)
-        await ctx.send(file=file2, embed=pic2)
-        await ctx.send(file=file3, embed=pic3)
+        view = MyPreview(ctx)
+        await ctx.send(embed=discord.Embed(title="Choose Which Boards You Want To See.", color=BotColours.main()), view=view)
 
     @commands.command(name="leaderboard", aliases=['leaderb', 'lb'], case_insensitive=True, help='''Makes The Leaderboards As Per This Format:
 **```
@@ -369,7 +419,7 @@ TOTAL1,TOTAL2,...
                               "BOARD 2": r'./RAWS/20 STYLES/BOARD 2.png',
                               "BOARD 3": r'./RAWS/20 STYLES/BOARD 3.png', }
 
-        view = MySelectView(ctx, file_paths)
+        view = MySelectView(ctx, file_paths, len(splitedte))
 
         splitedte = splitedte[:limit]
         splitedcd = splitedcd[:limit]
@@ -420,9 +470,9 @@ TOTAL1,TOTAL2,...
             TitleFont2 = ImageFont.truetype(
                 os.path.join(fontsFolder, 'Moonrising.ttf'), 67)
             TitleFont3 = ImageFont.truetype(
-                os.path.join(fontsFolder, 'Headlines-BoldItalic.otf'), 139)
+                os.path.join(fontsFolder, 'league-gothic.leaguegothic-italic.otf'), 139)
             TitleFont4 = ImageFont.truetype(
-                os.path.join(fontsFolder, 'Headlines-BoldItalic.otf'), 80)
+                os.path.join(fontsFolder, 'league-gothic.leaguegothic-italic.otf'), 80)
             TextFont1 = ImageFont.truetype(
                 os.path.join(fontsFolder, 'Retroica.ttf'), 25)
 
