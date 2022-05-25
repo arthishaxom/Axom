@@ -4,7 +4,7 @@ import asyncio
 from PIL import Image, ImageDraw, ImageFont
 from discord.ext import commands
 from discord.utils import get
-from Utilities.helpful_lb import top20, top25, top10
+from Utilities.helpful_lb import top20, top25, top10, top12
 import functools
 import io
 from Utilities.BotColoursInfo import BotColours
@@ -278,6 +278,9 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
                 elif len(splitedte) <= 10:
                     top10.title(draw, title, TitleFont3,
                                 TitleFont4, colors, reply)
+                elif len(splitedte) > 10 and len(splitedte) <= 12:
+                    top12.title(draw, title, TitleFont3,
+                                TitleFont4, colors, reply)
                 else:
                     top20.title(draw, title, TitleFont1,
                                 TitleFont2, colors, reply)
@@ -293,6 +296,12 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
                 top10.splitedpos(draw, splitedpos, TextFont1)
                 top10.splitedkill(draw, splitedkill, TextFont1)
                 top10.splitedtotal(draw, splitedtotal, TextFont1)
+            elif len(splitedte) > 10 and len(splitedte) <= 12:
+                top12.splitedte(draw, splitedte, TextFont1)
+                top12.splitedcd(draw, splitedcd, TextFont1)
+                top12.splitedpos(draw, splitedpos, TextFont1)
+                top12.splitedkill(draw, splitedkill, TextFont1)
+                top12.splitedtotal(draw, splitedtotal, TextFont1)
             else:
                 top20.splitedte(draw, splitedte, TextFont1)
                 top20.splitedcd(draw, splitedcd, TextFont1)
@@ -414,6 +423,10 @@ TOTAL1,TOTAL2,...
                 file_paths = {"BOARD 1": r'./RAWS/10 STYLES/BOARD 1.png',
                               "BOARD 2": r'./RAWS/10 STYLES/BOARD 2.png',
                               "BOARD 3": r'./RAWS/10 STYLES/BOARD 3.png', }
+            elif len(splitedte) > 10 and len(splitedte) <= 12:
+                file_paths = {"BOARD 1": r'./RAWS/12 STYLES/BOARD 1.png',
+                              "BOARD 2": r'./RAWS/12 STYLES/BOARD 2.png',
+                              "BOARD 3": r'./RAWS/12 STYLES/BOARD 3.png', }
             else:
                 file_paths = {"BOARD 1": r'./RAWS/20 STYLES/BOARD 1.png',
                               "BOARD 2": r'./RAWS/20 STYLES/BOARD 2.png',
@@ -503,8 +516,6 @@ TOTAL1,TOTAL2,...
                                   description=f'The Error : \n{traceback_text}', color=BotColours.error())
             embed.set_footer(text='Besure To Have Atleast 2')
             await ctx.send(embed=embed)
-            # os.remove(rf'./RESULTS/{server_name}BOARD1-RESULT.png')
-            # os.remove(rf"./COPIES/{server_name}here.png")
 
 
 async def setup(client):

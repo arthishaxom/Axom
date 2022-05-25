@@ -485,7 +485,7 @@ class top25:
 class top10():
     def splitedte(draw, splitedte, TextFont1):
         if len(splitedte) < 10:
-            for i in range(0, 20-len(splitedte)):
+            for i in range(0, 10-len(splitedte)):
                 splitedte.append("-")
         draw.text((235, 418), splitedte[0], fill='black', font=TextFont1)
         draw.text((235, 478), splitedte[1], fill='black', font=TextFont1)
@@ -499,8 +499,8 @@ class top10():
         draw.text((235, 954), splitedte[9], fill='black', font=TextFont1)
 
     def splitedcd(draw, splitedcd, TextFont1):
-        if len(splitedcd) < 20:
-            for i in range(0, 20-len(splitedcd)):
+        if len(splitedcd) < 10:
+            for i in range(0, 10-len(splitedcd)):
                 splitedcd.append("-")
         draw.text((667, 438), splitedcd[0],
                   fill='black', anchor="ms", font=TextFont1)
@@ -524,8 +524,8 @@ class top10():
                   fill='black', anchor="ms", font=TextFont1)
 
     def splitedpos(draw, splitedpos, TextFont1):
-        if len(splitedpos) < 20:
-            for i in range(0, 20-len(splitedpos)):
+        if len(splitedpos) < 10:
+            for i in range(0, 10-len(splitedpos)):
                 splitedpos.append("-")
         draw.text((807, 438), splitedpos[0],
                   fill='black', anchor="ms", font=TextFont1)
@@ -549,8 +549,8 @@ class top10():
                   fill='black', anchor="ms", font=TextFont1)
 
     def splitedkill(draw, splitedkill, TextFont1):
-        if len(splitedkill) < 20:
-            for i in range(0, 20-len(splitedkill)):
+        if len(splitedkill) < 10:
+            for i in range(0, 10-len(splitedkill)):
                 splitedkill.append("-")
         draw.text((943, 438), splitedkill[0],
                   fill='black', anchor="ms", font=TextFont1)
@@ -574,8 +574,8 @@ class top10():
                   fill='black', anchor="ms", font=TextFont1)
 
     def splitedtotal(draw, splitedtotal, TextFont1):
-        if len(splitedtotal) < 20:
-            for i in range(0, 20-len(splitedtotal)):
+        if len(splitedtotal) < 10:
+            for i in range(0, 10-len(splitedtotal)):
                 splitedtotal.append("-")
         draw.text((1090, 438), splitedtotal[0],
                   fill='black', anchor="ms", font=TextFont1)
@@ -596,6 +596,149 @@ class top10():
         draw.text((1090, 913), splitedtotal[8],
                   fill='black', anchor="ms", font=TextFont1)
         draw.text((1090, 973), splitedtotal[9],
+                  fill='black', anchor="ms", font=TextFont1)
+
+    def title(draw, title, TitleFont1, TitleFont2, colors, reply):
+        # Title
+        draw.text(
+            (145, 289), title[0], fill=f'{colors[reply]}', anchor="ls", font=TitleFont1)
+        # SubTitle
+        draw.text((150, 160), title[1], fill='white',
+                  anchor="ls", font=TitleFont2)
+
+
+class top12():
+    def splitedte(draw, splitedte, TextFont1):
+        if len(splitedte) < 12:
+            for i in range(0, 12-len(splitedte)):
+                splitedte.append("-")
+        draw.text((235, 418), splitedte[0], fill='black', font=TextFont1)
+        draw.text((235, 478), splitedte[1], fill='black', font=TextFont1)
+        draw.text((235, 536), splitedte[2], fill='black', font=TextFont1)
+        draw.text((235, 595), splitedte[3], fill='black', font=TextFont1)
+        draw.text((235, 655), splitedte[4], fill='black', font=TextFont1)
+        draw.text((235, 716), splitedte[5], fill='black', font=TextFont1)
+        draw.text((235, 775), splitedte[6], fill='black', font=TextFont1)
+        draw.text((235, 835), splitedte[7], fill='black', font=TextFont1)
+        draw.text((235, 894), splitedte[8], fill='black', font=TextFont1)
+        draw.text((235, 954), splitedte[9], fill='black', font=TextFont1)
+        draw.text((235, 1013), splitedte[10], fill='black', font=TextFont1)
+        draw.text((235, 1072), splitedte[11], fill='black', font=TextFont1)
+
+    def splitedcd(draw, splitedcd, TextFont1):
+        if len(splitedcd) < 12:
+            for i in range(0, 12-len(splitedcd)):
+                splitedcd.append("-")
+        draw.text((667, 438), splitedcd[0],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 498), splitedcd[1],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 555), splitedcd[2],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 614), splitedcd[3],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 674), splitedcd[4],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 735), splitedcd[5],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 794), splitedcd[6],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 854), splitedcd[7],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 913), splitedcd[8],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 973), splitedcd[9],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 1031), splitedcd[10],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((667, 1091), splitedcd[11],
+                  fill='black', anchor="ms", font=TextFont1)
+
+    def splitedpos(draw, splitedpos, TextFont1):
+        if len(splitedpos) < 12:
+            for i in range(0, 12-len(splitedpos)):
+                splitedpos.append("-")
+        draw.text((807, 438), splitedpos[0],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 498), splitedpos[1],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 555), splitedpos[2],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 614), splitedpos[3],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 674), splitedpos[4],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 735), splitedpos[5],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 794), splitedpos[6],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 854), splitedpos[7],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 913), splitedpos[8],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 973), splitedpos[9],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 1031), splitedpos[10],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((807, 1091), splitedpos[11],
+                  fill='black', anchor="ms", font=TextFont1)
+
+    def splitedkill(draw, splitedkill, TextFont1):
+        if len(splitedkill) < 12:
+            for i in range(0, 12-len(splitedkill)):
+                splitedkill.append("-")
+        draw.text((943, 438), splitedkill[0],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 498), splitedkill[1],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 555), splitedkill[2],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 614), splitedkill[3],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 674), splitedkill[4],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 735), splitedkill[5],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 794), splitedkill[6],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 854), splitedkill[7],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 913), splitedkill[8],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 973), splitedkill[9],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 1031), splitedkill[10],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((943, 1091), splitedkill[11],
+                  fill='black', anchor="ms", font=TextFont1)
+
+    def splitedtotal(draw, splitedtotal, TextFont1):
+        if len(splitedtotal) < 12:
+            for i in range(0, 12-len(splitedtotal)):
+                splitedtotal.append("-")
+        draw.text((1090, 438), splitedtotal[0],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 498), splitedtotal[1],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 555), splitedtotal[2],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 614), splitedtotal[3],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 674), splitedtotal[4],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 735), splitedtotal[5],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 794), splitedtotal[6],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 854), splitedtotal[7],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 913), splitedtotal[8],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 973), splitedtotal[9],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 1031), splitedtotal[10],
+                  fill='black', anchor="ms", font=TextFont1)
+        draw.text((1090, 1091), splitedtotal[11],
                   fill='black', anchor="ms", font=TextFont1)
 
     def title(draw, title, TitleFont1, TitleFont2, colors, reply):
