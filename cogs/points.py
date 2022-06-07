@@ -1,4 +1,3 @@
-from msilib import Table
 import discord
 from discord.ui import Button, View
 from discord.ext import commands
