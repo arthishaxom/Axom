@@ -46,7 +46,7 @@ class Dropdown(discord.ui.Select):
 
 class MySelectView(View):
     def __init__(self, ctx, teamlist):
-        super().__init__(timeout=60)
+        super().__init__(timeout=120)
         self.ctx = ctx
         self.value = None
         self.add_item(Dropdown(teamlist))
@@ -351,7 +351,7 @@ Send The Points System In The Format
             SlotlistOnly = SlotlistLineSplit
 
         SlotlistFinal = []
-        for i in [')', '=>', '>', '|', '-']:
+        for i in [')', '=>', '>', '|', '-', '->']:
             for team in SlotlistOnly:
                 if i in team:
                     ele = ((team.split(i))[1].strip())
@@ -388,7 +388,7 @@ Send The Points System In The Format
                         # embed2 = discord.Embed(
                         #     title=f"<:icon_usage:947347839518920714> What Is `{view.value}` Kills?", color=BotColours.main())
                         # embed_obj = await ctx.send(embed=embed2)
-                        TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
+                        TeamKillsQues = await self.client.wait_for("message", timeout=120, check=check)
                         TeamKills = int(TeamKillsQues.content)
 
                         TeamName = view.value
@@ -700,7 +700,7 @@ Send The Points System In The Format
                 SlotlistOnly = SlotlistLineSplit
 
             SlotlistFinal = []
-            for i in [')', '=>', '>', '|', '-', ':']:
+            for i in [')', '=>', '>', '|', '-', ':', '->']:
                 for team in SlotlistOnly:
                     if i in team:
                         ele = ((team.split(i))[1].strip())
@@ -747,7 +747,7 @@ Send The Points System In The Format
                     return
                 if inview.value in TeamList:
                     try:
-                        TeamKillsQues = await self.client.wait_for("message", timeout=60, check=check)
+                        TeamKillsQues = await self.client.wait_for("message", timeout=120, check=check)
                     except asyncio.TimeoutError:
                         timeup_embed = discord.Embed(
                             title="Times Up <:icon_clock:947357599030997043>", color=BotColours.error())
