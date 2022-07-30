@@ -148,8 +148,14 @@ class MySelectView(View):
             pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
             file3 = discord.File(r'./PREVS/20 STYLES/BOARD-3.png')
             pic3.set_image(url=r'attachment://BOARD-3.png')
-            await interaction.response.defer()
-            await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
+            pic4 = discord.Embed(title="BOARD 4", color=BotColours.main())
+            file4 = discord.File(r'./PREVS/20 STYLES/BOARD-4.png')
+            pic4.set_image(url=r'attachment://BOARD-4.png')
+            button.disabled = True
+            await interaction.response.edit_message(view=self)
+            # await interaction.response.defer()
+            await interaction.followup.send(embeds=[pic, pic2, pic3, pic4], files=[file, file2, file3, file4], ephemeral=True)
+
         else:
             pic = discord.Embed(title="BOARD 1", color=BotColours.main())
             file = discord.File(r'./PREVS/10 STYLES/BOARD-1.png')
@@ -160,8 +166,13 @@ class MySelectView(View):
             pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
             file3 = discord.File(r'./PREVS/10 STYLES/BOARD-3.png')
             pic3.set_image(url=r'attachment://BOARD-3.png')
-            await interaction.response.defer()
-            await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3], ephemeral=True)
+            pic4 = discord.Embed(title="BOARD 4", color=BotColours.main())
+            file4 = discord.File(r'./PREVS/10 STYLES/BOARD-4.png')
+            pic4.set_image(url=r'attachment://BOARD-4.png')
+            button.disabled = True
+            await interaction.response.edit_message(view=self)
+            # await interaction.response.defer()
+            await interaction.followup.send(files=[file, file2, file3, file4], embeds=[pic, pic2, pic3, pic4], ephemeral=True)
 
     async def interaction_check(self, interaction: discord.Interaction):
         if self.ctx.author.id != interaction.user.id:
@@ -176,6 +187,7 @@ class MyPreview(View):
     def __init__(self, ctx):
         super().__init__(timeout=60)
         self.ctx = ctx
+        self.response = None
 
     @discord.ui.button(label="Top 10", style=discord.ButtonStyle.grey)
     async def top10_callback(self, interaction, button):
@@ -188,10 +200,13 @@ class MyPreview(View):
         pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
         file3 = discord.File(r'./PREVS/10 STYLES/BOARD-3.png')
         pic3.set_image(url=r'attachment://BOARD-3.png')
+        pic4 = discord.Embed(title="BOARD 4", color=BotColours.main())
+        file4 = discord.File(r'./PREVS/10 STYLES/BOARD-4.png')
+        pic4.set_image(url=r'attachment://BOARD-4.png')
         button.disabled = True
         await interaction.response.edit_message(view=self)
         # await interaction.response.defer()
-        await interaction.followup.send(files=[file, file2, file3], embeds=[pic, pic2, pic3])
+        await interaction.followup.send(files=[file, file2, file3, file4], embeds=[pic, pic2, pic3, pic4])
 
     @discord.ui.button(label="Top 20", style=discord.ButtonStyle.grey)
     async def top20_callback(self, interaction, button):
@@ -204,18 +219,24 @@ class MyPreview(View):
         pic3 = discord.Embed(title="BOARD 3", color=BotColours.main())
         file3 = discord.File(r'./PREVS/20 STYLES/BOARD-3.png')
         pic3.set_image(url=r'attachment://BOARD-3.png')
+        pic4 = discord.Embed(title="BOARD 4", color=BotColours.main())
+        file4 = discord.File(r'./PREVS/20 STYLES/BOARD-4.png')
+        pic4.set_image(url=r'attachment://BOARD-4.png')
         button.disabled = True
         await interaction.response.edit_message(view=self)
         # await interaction.response.defer()
-        await interaction.followup.send(embeds=[pic, pic2, pic3], files=[file, file2, file3])
+        await interaction.followup.send(embeds=[pic, pic2, pic3, pic4], files=[file, file2, file3, file4])
+
+    async def on_timeout(self):
+        for item in self.children:
+            item.disabled = True
+        await self.response.edit(view=self)
+        return
 
     async def interaction_check(self, interaction: discord.Interaction):
         if self.ctx.author.id != interaction.user.id:
             return await interaction.response.send_message(content=f"You can't do that! Only {self.ctx.author.mention} can do that!", ephemeral=True)
         return True
-
-    async def on_timeout(self):
-        return
 
 
 class Leaderboard(commands.Cog):
@@ -239,7 +260,11 @@ class Leaderboard(commands.Cog):
     @commands.bot_has_permissions(embed_links=True, attach_files=True)
     async def _preview(self, ctx):
         view = MyPreview(ctx)
-        await ctx.send(embed=discord.Embed(title="Choose Which Boards You Want To See.", color=BotColours.main()), view=view)
+        embed_msg = await ctx.send(embed=discord.Embed(title="Choose Which Boards You Want To See.", color=BotColours.main()), view=view)
+        view.response = embed_msg
+        res = await view.wait()
+        if res:
+            return
 
     @commands.command(name="leaderboard", aliases=['leaderb', 'lb'], case_insensitive=True, help='''Makes The Leaderboards As Per This Format:
 **```
@@ -418,19 +443,23 @@ TOTAL1,TOTAL2,...
             if len(splitedte) > 20:
                 file_paths = {"BOARD 1": r'./RAWS/25 STYLES/BOARD 1.png',
                               "BOARD 2": r'./RAWS/25 STYLES/BOARD 2.png',
-                              "BOARD 3": r'./RAWS/25 STYLES/BOARD 3.png', }
+                              "BOARD 3": r'./RAWS/25 STYLES/BOARD 3.png',
+                              "BOARD 4": r'./RAWS/25 STYLES/BOARD 4.png', }
             elif len(splitedte) <= 10:
                 file_paths = {"BOARD 1": r'./RAWS/10 STYLES/BOARD 1.png',
                               "BOARD 2": r'./RAWS/10 STYLES/BOARD 2.png',
-                              "BOARD 3": r'./RAWS/10 STYLES/BOARD 3.png', }
+                              "BOARD 3": r'./RAWS/10 STYLES/BOARD 3.png',
+                              "BOARD 4": r'./RAWS/10 STYLES/BOARD 4.png', }
             elif len(splitedte) > 10 and len(splitedte) <= 12:
                 file_paths = {"BOARD 1": r'./RAWS/12 STYLES/BOARD 1.png',
                               "BOARD 2": r'./RAWS/12 STYLES/BOARD 2.png',
-                              "BOARD 3": r'./RAWS/12 STYLES/BOARD 3.png', }
+                              "BOARD 3": r'./RAWS/12 STYLES/BOARD 3.png',
+                              "BOARD 4": r'./RAWS/12 STYLES/BOARD 4.png', }
             else:
                 file_paths = {"BOARD 1": r'./RAWS/20 STYLES/BOARD 1.png',
                               "BOARD 2": r'./RAWS/20 STYLES/BOARD 2.png',
-                              "BOARD 3": r'./RAWS/20 STYLES/BOARD 3.png', }
+                              "BOARD 3": r'./RAWS/20 STYLES/BOARD 3.png',
+                              "BOARD 4": r'./RAWS/20 STYLES/BOARD 4.png', }
 
         view = MySelectView(ctx, file_paths, len(splitedte))
 
@@ -450,7 +479,7 @@ TOTAL1,TOTAL2,...
         await embed_msg.edit(embed=embed3, view=view)
 
         colors = {"BOARD 1": r'#25e4d4',
-                  "BOARD 2": r'#ff5500', "BOARD 3": r'#ff0000'}
+                  "BOARD 2": r'#ff5500', "BOARD 3": r'#ff0000', "BOARD 4": r'#22e77a'}
         server_nname = ctx.message.guild.name
         server_name = ''
         for i in server_nname:

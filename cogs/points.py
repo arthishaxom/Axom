@@ -700,11 +700,22 @@ Send The Points System In The Format
                 SlotlistOnly = SlotlistLineSplit
 
             SlotlistFinal = []
-            for i in [')', '=>', '>', '|', '-', ':', '->']:
+            if '=>' in SlotlistOnly[0]:
                 for team in SlotlistOnly:
-                    if i in team:
-                        ele = ((team.split(i))[1].strip())
-                        SlotlistFinal.append(ele)
+                    ele = ((team.split('=>'))[1].strip())
+                    SlotlistFinal.append(ele)
+            if '->' in SlotlistOnly[0]:
+                for team in SlotlistOnly:
+                    ele = ((team.split('->'))[1].strip())
+                    SlotlistFinal.append(ele)
+            else:
+                for i in ['>', '|', '-', ':', ')']:
+                    if i in SlotlistOnly[0]:
+                        for team in SlotlistOnly:
+                            ele = ((team.split(i))[1].strip())
+                            SlotlistFinal.append(ele)
+                    else:
+                        continue
             if len(SlotlistFinal) == 0:
                 await ctx.send("**Next Time Send A Real Slotlist Like This - \n```\n1) Team1\n2)Team2\n```**")
                 return
