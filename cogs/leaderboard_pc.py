@@ -294,9 +294,9 @@ Use `&c1` Or `&c2` To Get The Points In This Format.''')
             draw = ImageDraw.Draw(here)
             return draw, here
 
-        def making_board(here, draw, TextFont1, splitedte, splitedcd, splitedpos, splitedkill, splitedtotal, pguilds):
+        def making_board(here, draw, TextFont1, splitedte, splitedcd, splitedpos, splitedkill, splitedtotal, custominput):
 
-            if ctx.message.guild.id not in pguilds:
+            if custominput != "no":
                 if len(splitedte) > 20:
                     top25.title(draw, title, TitleFont1,
                                 TitleFont2, colors, reply)
@@ -398,35 +398,9 @@ TOTAL1,TOTAL2,...
             await ctx.send(embed=embed)
             return
 
-
-#         if ctx.message.guild.id not in pguilds:
-#             embed2 = discord.Embed(title='**ENTER TITLE & SUBTITLE**', description='''
-# > Title,Subitle
-# > Example : T3 SCRIMS,XYZ ESPORTS
-# <a:red:938971541662761001> Length Of The Titles Should Under 15.
-# ''', color=BotColours.main())
-#             embed2.set_footer(text='Spaces Are Also Counted.')
-#             await embed_msg.edit(embed=embed2)
-#             try:
-#                 msg = await self.client.wait_for("message", timeout=60, check=check)
-#             except asyncio.TimeoutError:
-#                 await msg.delete()
-#                 embed = discord.Embed(
-#                     title=f'TIMEOUT !!!', description=f'Reply Faster Next Time', color=BotColours.error())
-#                 await ctx.send(embed=embed)
-#                 return
-#             try:
-#                 title = msg.content
-#                 title = title.split(",")
-#             except Exception as e:
-#                 await msg.delete()
-#                 embed = discord.Embed(title=f'SOME ERROR OCCURED !!!',
-#                                       description=f'The Error : \n{e}', color=BotColours.error())
-#                 await ctx.send(embed=embed)
-#                 return
-#             await msg.delete()
         pguilds = []
         file_paths = {}
+        colors = {}
         limit = 25
         async with self.client.pool.acquire() as connection:
             async with connection.transaction():
@@ -436,8 +410,9 @@ TOTAL1,TOTAL2,...
             filepaths = (data[0][1]).split(";;")
             for filepath in filepaths:
                 file_paths[ntpath.basename(filepath)[:-4]] = rf"{filepath}"
-                pguilds = [data[0][0]]
-                limit = data[0][2]
+            limit = data[0][2]
+            custominput = data[0][3]
+            Titlecolor = data[0][4]
 
         else:
             if len(splitedte) > 20:
@@ -478,8 +453,13 @@ TOTAL1,TOTAL2,...
                 title='**CHOOSE AN OPTION**', color=BotColours.main())
         await embed_msg.edit(embed=embed3, view=view)
 
-        colors = {"BOARD 1": r'#25e4d4',
-                  "BOARD 2": r'#ff5500', "BOARD 3": r'#ff0000', "BOARD 4": r'#22e77a'}
+        if Titlecolor == "no":
+            colors = {"BOARD 1": r'#25e4d4',
+                      "BOARD 2": r'#ff5500', "BOARD 3": r'#ff0000', "BOARD 4": r'#22e77a'}
+        else:
+            for filepath in filepaths:
+                colors[ntpath.basename(filepath)[:-4]] = rf"{Titlecolor}"
+            # colors = {"BOARD 1": r'#ffe953'}
         server_nname = ctx.message.guild.name
         server_name = ''
         for i in server_nname:
@@ -522,7 +502,7 @@ TOTAL1,TOTAL2,...
                 openingFile, file_paths, reply, server_name)
             draw, here = await self.client.loop.run_in_executor(None, thing)
             thing = functools.partial(making_board, here, draw, TextFont1,
-                                      splitedte, splitedcd, splitedpos, splitedkill, splitedtotal, pguilds)
+                                      splitedte, splitedcd, splitedpos, splitedkill, splitedtotal, custominput)
             embed5 = discord.Embed(
                 title="**Done <a:icon_done:939411770458640425>**", color=BotColours.main())
             file = await self.client.loop.run_in_executor(None, thing)
