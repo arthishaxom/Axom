@@ -402,6 +402,8 @@ TOTAL1,TOTAL2,...
         file_paths = {}
         colors = {}
         limit = 25
+        Titlecolor = "no"
+        custominput = "default"
         async with self.client.pool.acquire() as connection:
             async with connection.transaction():
                 data = await connection.fetch(f'''SELECT * FROM premium WHERE serverid = $1''', ctx.message.guild.id)

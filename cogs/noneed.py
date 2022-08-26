@@ -33,10 +33,9 @@ class noneed(commands.Cog, command_attrs=dict(hidden=True)):
         async with self.client.pool.acquire() as connection:
             # create a transaction for that connection
             async with connection.transaction():
-                for i in range(10):
-                    await connection.execute(f'''CREATE TABLE IF NOT EXISTS Points{i+1}(ServerID BIGINT,TeamNames VARCHAR(50),WWCD{i+1} SMALLINT,Position{i+1} SMALLINT,Kills{i+1} SMALLINT,Total{i+1} SMALLINT)''')
-                    await connection.execute(f'''CREATE TABLE IF NOT EXISTS SaveInfo(ServerID BIGINT,TableNum SMALLINT,Slotlist VARCHAR(1000),LeftMatches SMALLINT, MatchPos VARCHAR(1000), MatchCd VARCHAR(1000))''')
-
+                await connection.execute(f'''CREATE TABLE IF NOT EXISTS pointstable(ServerID BIGINT, MatchNum SMALLINT,TeamNames VARCHAR(50),WWCD SMALLINT,Position SMALLINT,Kills SMALLINT,Total SMALLINT)''')
+                await connection.execute(f'''CREATE TABLE IF NOT EXISTS saveinfo(ServerID BIGINT,TableNum SMALLINT,Slotlist VARCHAR(1000),LeftMatches SMALLINT, MatchPos VARCHAR(1000), MatchCd VARCHAR(1000))''')
+                await connection.execute(f'''CREATE TABLE IF NOT EXISTS premium(ServerID BIGINT,filepaths VARCHAR,limits SMALLINT,customimput VARCHAR,color VARCHAR)''')
         await ctx.send("Created Table")
 
     @commands.command(name='deletetable', aliases=["dt", "deletet"], case_insensitive=True)
