@@ -1,1 +1,1 @@
-# Axom bOT dISCORD BOT
+# Axom Discord Bot
