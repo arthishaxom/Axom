@@ -38,7 +38,7 @@ client = commands.Bot(command_prefix='&', activity=activity,
 # client.loop.run_until_complete(create_pool())
 
 async def main():
-    async with client, asyncpg.create_pool(user="", password="", host="localhost", database="axomdb") as pool:
+    async with client, asyncpg.create_pool(user="", password="", host="localhost", database="") as pool:
         client.pool = pool
         for filename in os.listdir('./cogs'):
             if filename.endswith('.py'):
